@@ -83,26 +83,26 @@
                 results.</p>
         </noscript>
         <script>
-            (() => {
-                const input = document.getElementById('search');
-                const tbody = document.getElementById('usersTbody');
-                if (!input || !tbody) return;
+        (() => {
+            const input = document.getElementById('search');
+            const tbody = document.getElementById('usersTbody');
+            if (!input || !tbody) return;
 
-                input.addEventListener('input', () => {
-                    const q = input.value.toLowerCase().trim();
-                    [...tbody.querySelectorAll('tr')].forEach(row => {
-                        if (row.querySelector('td[colspan]')) return;
-                        const text = row.textContent.toLowerCase();
-                        row.style.display = text.includes(q) ? '' : 'none';
-                    });
-                    const visible = [...tbody.querySelectorAll('tr')].some(row => row.style.display !== 'none');
-                    if (!visible) {
-                        document.getElementById('noResults').classList.remove('hidden');
-                    } else {
-                        document.getElementById('noResults').classList.add('hidden');
-                    }
+            input.addEventListener('input', () => {
+                const q = input.value.toLowerCase().trim();
+                [...tbody.querySelectorAll('tr')].forEach(row => {
+                    if (row.querySelector('td[colspan]')) return;
+                    const text = row.textContent.toLowerCase();
+                    row.style.display = text.includes(q) ? '' : 'none';
                 });
-            })();
+                const visible = [...tbody.querySelectorAll('tr')].some(row => row.style.display !== 'none');
+                if (!visible) {
+                    document.getElementById('noResults').classList.remove('hidden');
+                } else {
+                    document.getElementById('noResults').classList.add('hidden');
+                }
+            });
+        })();
         </script>
     </main>
 </body>

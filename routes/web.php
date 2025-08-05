@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\UserController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -14,20 +16,12 @@ Route::redirect('contact', 'contact-us', 301);
 
 Route::view('privacy-policy', 'static.privacy-policy');
 
+Route::resource('customers', CustomerController::class);
 
-Route::prefix('customers')->group(function () {
+Route::resource('users', UserController::class);
+
+/*Route::prefix('customers')->group(function () {
     Route::get('/', function () {
-        $customers = [
-            ['name' => 'Hassan Mahmoud', 'city' => 'Cairo', 'country' => 'Egypt', 'phone' => '01000000000'],
-            ['name' => 'Ahmed Ali', 'city' => 'Alex', 'country' => 'Egypt', 'phone' => '01000000001'],
-            ['name' => 'Eman Ahmed', 'city' => 'Giza', 'country' => 'Egypt', 'phone' => '01000000002'],
-            ['name' => 'Jailan Yousef', 'city' => 'Giza', 'country' => 'Egypt', 'phone' => '01000000002'],
-            ['name' => 'Yara Mostafa', 'city' => 'Cairo', 'country' => 'Egypt', 'phone' => '01000000003'],
-            ['name' => 'Maged Ali', 'city' => 'Alex', 'country' => 'Egypt', 'phone' => '01000000004'],
-            ['name' => 'Ali Ibrahim', 'city' => 'Giza', 'country' => 'Egypt', 'phone' => '01000000005'],
-            ['name' => 'Hassan Ali', 'city' => 'Cairo', 'country' => 'Egypt', 'phone' => '01000000006'],
-            ['name' => 'Mohamed Ahmed', 'city' => 'Alex', 'country' => 'Egypt', 'phone' => '01000000007'],
-        ];
 
         return view('customers.index', compact('customers'));
     });
@@ -55,23 +49,15 @@ Route::prefix('customers')->group(function () {
     Route::get('by-code/{code}', function () {
         return 'Customers by Code';
     })->where('code', '[a-z]{3}-[\d]{3}');
-});
+});*/
 
-Route::prefix('/users')->group(function () {
-    Route::get('/', function () {
-        $users = [
-            ['name' => 'John Doe', 'email' => 'johndoe@example.com', 'phone' => '01000000000', 'role' => 'admin'],
-            ['name' => 'Jane Doe', 'email' => 'janedoe@example.com', 'phone' => '01000000001', 'role' => 'user'],
-            ['name' => 'Alice Smith', 'email' => 'alicesmith@example.com', 'phone' => '01000000002', 'role' => 'manager'],
-            ['name' => 'Bob Johnson', 'email' => 'bobjohnson@example.com', 'phone' => '01000000003', 'role' => 'user'],
-        ];
-        return view('users.index', compact('users'));
-    });
+/*Route::prefix('/users')->group(function () {
 
-    Route::get('/create', fn() => view('users.create'));
-    Route::get('/show/{user}', fn($user) => view('users.show', ['user' => $user]))->whereNumber('user');
-    Route::get('/edit/{user}', fn($user) => view('users.edit', ['user' => $user]))->whereNumber('user');
-    Route::get('/delete/{user}', fn($user) => "Delete User $user")->whereNumber('user');
-    Route::get('/role/{role}', fn($role) => "Users with role: $role")->whereIn('role', ['admin', 'user', 'guest', 'manager']);
-});
+    Route::get('/', [UserController::class, 'index']);
+    Route::get('/create', [UserController::class, 'create']);
+    Route::get('/show/{user}', [UserController::class, 'show'])->whereNumber('user');
+    Route::get('/edit/{user}', [UserController::class, 'edit'])->whereNumber('user');
+    Route::get('/delete/{user}', [UserController::class, 'destroy'])->whereNumber('user');
+    Route::get('/role/{role}', [UserController::class, 'role'])->whereIn('role', ['admin', 'user', 'guest', 'manager']);
+});*/
 Route::fallback(fn() => abort(404));

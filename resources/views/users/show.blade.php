@@ -14,7 +14,15 @@
 
         <div>
             <h2 class="text-lg font-medium text-gray-800">ID:</h2>
-            <p class="text-gray-600">{{ $user }}</p>
+            <p class="text-gray-600">{{ $user['id'] }}</p>
+            <h2 class="text-lg font-medium text-gray-800">Name:</h2>
+            <p class="text-gray-600">{{ $user['name'] }}</p>
+            <h2 class="text-lg font-medium text-gray-800">Email:</h2>
+            <p class="text-gray-600">{{ $user['email'] }}</p>
+            <h2 class="text-lg font-medium text-gray-800">Phone:</h2>
+            <p class="text-gray-600">{{ $user['phone'] }}</p>
+            <h2 class="text-lg font-medium text-gray-800">Role:</h2>
+            <p class="text-gray-600">{{ $user['role'] }}</p>
         </div>
     </div>
 </body>

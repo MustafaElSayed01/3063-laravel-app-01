@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-    protected $users = [
+    private $users = [
         ['id' => 1, 'name' => 'John Doe', 'email' => 'johndoe@example.com', 'phone' => '1000000000', 'role' => 'admin'],
         ['id' => 2, 'name' => 'Jane Doe', 'email' => 'janedoe@example.com', 'phone' => '1000000001', 'role' => 'user'],
         ['id' => 3, 'name' => 'Alice Smith', 'email' => 'alicesmith@example.com', 'phone' => '1000000002', 'role' => 'manager'],

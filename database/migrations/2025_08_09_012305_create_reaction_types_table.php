@@ -12,7 +12,9 @@ return new class extends Migration {
     {
         Schema::create('reaction_types', function (Blueprint $table) {
             $table->id();
+            $table->string('type')->unique();
             $table->timestamps();
+$table->softDeletes();
         });
     }
 

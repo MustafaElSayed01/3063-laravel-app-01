@@ -14,9 +14,9 @@ return new class extends Migration {
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('reaction_type_id');
+            $table->morphs('reactable');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('reaction_type_id')->references('id')->on('reaction_types')->onDelete('cascade');
-            $table->morphs('reactable');
             $table->timestamps();
             $table->softDeletes();
         });

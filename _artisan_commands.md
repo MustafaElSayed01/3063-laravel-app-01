@@ -61,8 +61,25 @@ php artisan migrate:fresh
 php artisan migrate:status
 ```
 
-
 # Create model
 ```bash
-php artisan make:model Post
+php artisan make:model {modelname capitalized - singular}
+```
+<!-- Seeders and Factory -->
+# Create Seeders and Factories
+```bash
+php artisan make:seeder UserSeeder {--model=modelname capitalized - singular}
+php artisan make:factory UserFactory {--model=modelname capitalized - singular}
+```
+# Run Specific Seeder
+```bash
+php artisan db:seed --class=UserSeeder {--class=seederName}
+```
+# Run All Seeders
+```bash
+php artisan db:seed
+```
+# Re-migrate and seed
+```bash
+php artisan migrate:fresh --seed
 ```

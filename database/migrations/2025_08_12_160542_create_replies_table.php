@@ -15,8 +15,6 @@ return new class extends Migration {
         Schema::create('replies', function (Blueprint $table) {
             $table->id();
             $table->text('reply');
-            $table->unsignedBigInteger('user_id');
-            $table->unsignedBigInteger('comment_id');
             $table->foreignIdFor(User::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(Comment::class)->constrained()->cascadeOnDelete();
             $table->timestamps();

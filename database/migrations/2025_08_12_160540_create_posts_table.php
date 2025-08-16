@@ -16,8 +16,6 @@ return new class extends Migration {
             $table->id();
             $table->string('title');
             $table->text('body');
-            $table->unsignedBigInteger('user_id');
-            $table->unsignedBigInteger('post_status_id');
             $table->foreignIdFor(User::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(PostStatus::class)->constrained()->cascadeOnDelete();
             $table->timestamps();

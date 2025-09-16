@@ -9,4 +9,29 @@ class PostStatus extends Model
 {
     /** @use HasFactory<\Database\Factories\PostStatusFactory> */
     use HasFactory;
+
+    /**
+     * The attributes that aren't mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $guarded = [];
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
+    protected $fillable = [
+        'type',
+    ];
+
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var list<string>
+     */
+    protected $hidden = [
+        //
+    ];
 }

@@ -19,7 +19,8 @@ class DatabaseSeeder extends Seeder
             ReactionTypeSeeder::class,
             PostSeeder::class,
             CommentSeeder::class,
-            ReplySeeder::class
+            ReplySeeder::class,
+            ReactionSeeder::class
         ]);
     }
 }

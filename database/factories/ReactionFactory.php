@@ -2,6 +2,15 @@
 
 namespace Database\Factories;
 
+use App\Models\{
+    Comment,
+    Post,
+    Reaction,
+    ReactionType,
+    Reply,
+    User
+};
+
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -16,8 +25,32 @@ class ReactionFactory extends Factory
      */
     public function definition(): array
     {
+        $reaction_type_id = ReactionType::inRandomOrder()->first()->id;
+
+        $user_id = User::inRandomOrder()->first()->id;
+        $reactable_type = $this->faker->randomElement(['post', 'comment', 'reply']);
+
+        $reactable_id = match ($reactable_type) {
+            'post' => Post::inRandomOrder()->first()->id,
+            'comment' => Comment::inRandomOrder()->first()->id,
+            'reply' => Reply::inRandomOrder()->first()->id,
+        };
+
+        $exists = Reaction::
+            where('user_id', $user_id)->
+            where('reactable_type', $reactable_type)->
+            where('reactable_id', $reactable_id)
+            ->get();
+
+        if ($exists->count() > 0) {
+            return $this->definition();
+        }
+
         return [
-            //
+            'user_id' => $user_id,
+            'reactable_type' => $reactable_type,
+            'reactable_id' => $reactable_id,
+            'reaction_type_id' => $reaction_type_id,
         ];
     }
 }

@@ -4,7 +4,9 @@ use App\Http\Controllers\{
     AuthController,
     CommentController,
     PostController,
+    PostStatusController,
     ReactionController,
+    ReactionTypeController,
     ReplyController,
     UserController
 };
@@ -25,11 +27,63 @@ Route::prefix('auth')->controller(AuthController::class)->group(function () {
 
 Route::middleware(['auth:sanctum'])->group(function () {
 
+    // Posts
+    Route::prefix('posts')->controller(PostController::class)->group(function () {
+        Route::get('sample', 'random');
+        Route::get('deleted', 'deleted');
+        Route::get('restore/{id}', 'restore');
+        Route::delete('hard-delete/{id}', 'hard_delete');
+    });
+
+    // Comments
+    Route::prefix('comments')->controller(CommentController::class)->group(function () {
+        Route::get('deleted', 'deleted');
+        Route::get('restore/{id}', 'restore');
+        Route::delete('hard-delete/{id}', 'hard_delete');
+    });
+
+    // Replies
+    Route::prefix('replies')->controller(ReplyController::class)->group(function () {
+        Route::get('deleted', 'deleted');
+        Route::get('restore/{id}', 'restore');
+        Route::delete('hard-delete/{id}', 'hard_delete');
+    });
+
+    // Users
+    Route::prefix('users')->controller(UserController::class)->group(function () {
+        Route::get('deleted', 'deleted');
+        Route::get('restore/{id}', 'restore');
+        Route::delete('hard-delete/{id}', 'hard_delete');
+    });
+
+    // Reactions
+    Route::prefix('reactions')->controller(ReactionController::class)->group(function () {
+        Route::get('deleted', 'deleted');
+        Route::get('restore/{id}', 'restore');
+        Route::delete('hard-delete/{id}', 'hard_delete');
+    });
+
+    // Post-Statuses
+    Route::prefix('post-statuses')->controller(PostStatusController::class)->group(function () {
+        Route::get('deleted', 'deleted');
+        Route::get('restore/{id}', 'restore');
+        Route::delete('hard-delete/{id}', 'hard_delete');
+    });
+
+    // Reaction-Types
+    Route::prefix('reaction-types')->controller(ReactionTypeController::class)->group(function () {
+        Route::get('deleted', 'deleted');
+        Route::get('restore/{id}', 'restore');
+        Route::delete('hard-delete/{id}', 'hard_delete');
+    });
+
     // Posts, comments, reactions, users, replies
     Route::apiResources(
         [
+            'post-statuses' => PostStatusController::class,
             'posts' => PostController::class,
             'comments' => CommentController::class,
+            'reaction-types' => ReactionTypeController::class,
             'replies' => ReplyController::class,
             'users' => UserController::class,
             'reactions' => ReactionController::class,
@@ -38,18 +92,24 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // Auth
     Route::prefix('auth')->controller(AuthController::class)->group(function () {
+
         // All Sessions
-        Route::get('active-sessions', 'active_sessions');
+        Route::prefix('sessions')->group(function () {
+            Route::get('active', 'active_sessions');
+            Route::get('current', 'current_session');
+            Route::get('others', 'other_sessions');
+            Route::get('{id}', 'show_session');
+        });
 
         // logout
         Route::prefix('logout')->group(function () {
             Route::post('all', 'logout_all');
             Route::post('current', 'logout_current');
             Route::post('others', 'logout_others');
-            Route::post('session/{id}', 'logout_session');
+            Route::post('{id}', 'logout_session');
         });
-        // Profile
 
+        // Profile
         Route::prefix('profile')->group(function () {
             Route::get('', 'show_profile');
             Route::put('', 'update_profile');

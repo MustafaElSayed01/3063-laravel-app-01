@@ -11,7 +11,7 @@ class UpdatePostStatusRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,7 @@ class UpdatePostStatusRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'type' => 'required|string|between:1,30|unique:post_statuses',
         ];
     }
 }

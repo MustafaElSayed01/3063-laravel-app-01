@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Reaction extends Model
 {
@@ -25,6 +26,7 @@ class Reaction extends Model
     protected $fillable = [
         'reactable_id',
         'reactable_type',
+        'user_id',
         'reaction_type_id',
     ];
 
@@ -36,4 +38,10 @@ class Reaction extends Model
     protected $hidden = [
         //
     ];
+
+    // Relationships
+    public function reactionType(): BelongsTo
+    {
+        return $this->belongsTo(ReactionType::class);
+    }
 }

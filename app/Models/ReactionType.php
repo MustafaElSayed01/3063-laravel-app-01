@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ReactionType extends Model
 {
@@ -24,6 +25,7 @@ class ReactionType extends Model
      */
     protected $fillable = [
         'type',
+        'user_id',
     ];
 
     /**
@@ -34,4 +36,10 @@ class ReactionType extends Model
     protected $hidden = [
         //
     ];
+
+    // Relationships
+    public function reactions(): HasMany
+    {
+        return $this->hasMany(Reaction::class);
+    }
 }

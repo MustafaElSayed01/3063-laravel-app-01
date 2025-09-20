@@ -7,10 +7,20 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 
 class AuthController extends Controller
 {
-    public function web_login(LoginRequest $request)
+
+    /**
+     * Web login
+     *
+     * Validate login credentials and return user with token if valid
+     *
+     * @param LoginRequest $request
+     * @return \Illuminate\Http\Response
+     */
+    public function web_login(LoginRequest $request): JsonResponse
     {
         $data = $request->validated();
         $auth = Auth::attempt($data);
@@ -18,12 +28,21 @@ class AuthController extends Controller
             $user = Auth::user();
             $token = $user->createToken('web');
             $user['token'] = $token->plainTextToken;
-            return $user;
+            return response()->json($user, 200);
         }
-        return 'No';
+        return response()->json(['message' => 'Unauthorized'], 401);
     }
 
-    public function mobile_login(LoginRequest $request)
+
+    /**
+     * Mobile login
+     *
+     * Validate login credentials and return user with token if valid
+     *
+     * @param LoginRequest $request
+     * @return \Illuminate\Http\Response
+     */
+    public function mobile_login(LoginRequest $request): JsonResponse
     {
         $data = $request->validated();
         $auth = Auth::attempt($data);
@@ -31,48 +50,93 @@ class AuthController extends Controller
             $user = Auth::user();
             $token = $user->createToken('mobile');
             $user['token'] = $token->plainTextToken;
-            return $user;
+            return response()->json($user, 200);
         }
-        return 'No';
+        return response()->json(['message' => 'Unauthorized'], 401);
     }
 
-    public function active_sessions()
+    // Session Management Routes
+    // All Active Sessions for current user
+    public function active_sessions(Request $request): JsonResponse
     {
-        $user = Auth::user();
-        return $user->tokens;
+        $user = $request->user();
+        $tokens = $user->tokens;
+        return response()->json($tokens, 200);
     }
 
-    public function logout_session($id)
+    // Current Session for current user
+    public function current_session(Request $request): JsonResponse
     {
-        $session = Auth::user()->tokens()->where('id', $id)->first();
-        $status = $session ? $session->delete() : false;
-        return $status ? 'Session deleted Successfully' : 'Session not found';
+        $user = $request->user();
+        $currentTokenId = $user->currentAccessToken()->id;
+        $currentToken = $user->tokens()->where('id', $currentTokenId)->first();
+        if ($currentToken) {
+            return response()->json($currentToken, 200);
+        }
+        return response()->json(['message' => 'No current session found'], 404);
     }
 
-    public function logout_current()
+    // Other Sessions for current user
+    public function other_sessions(Request $request): JsonResponse
     {
-        $session = Auth::user()->currentAccessToken();
-        return $session ? $session->delete() : 'No active session';
+        $user = $request->user();
+        $currentTokenId = $request->user()->currentAccessToken()->id;
+        $otherTokens = $user->tokens()->whereNot('id', $currentTokenId)->get();
+        if ($otherTokens->isNotEmpty()) {
+            return response()->json($otherTokens, 200);
+        }
+        return response()->json(['message' => 'No other sessions found'], 404);
+    }
+    // Show specific session by ID for current user
+    public function show_session(Request $request, $id): JsonResponse
+    {
+        $user = $request->user();
+        $token = $user->tokens()->where('id', $id)->first();
+        if ($token) {
+            return response()->json($token, 200);
+        }
+        return response()->json(['message' => 'Session not found'], 404);
     }
 
-    public function logout_others()
+    // Logout Routes
+    // Logout from all sessions for current user
+    public function logout_all(Request $request): JsonResponse
     {
-        $activeSession = Auth::user()->currentAccessToken();
-
-        $deleted = Auth::user()->tokens()->whereNot('id', $activeSession->id)->delete();
-
-        return $deleted ? 'Logged out from other sessions successfully' : 'No active session';
+        $delete = $request->user()->tokens()->delete();
+        return $delete ? response()->json(['message' => 'Logged out from all sessions'], 200) : response()->json(['message' => 'Failed to logout'], 500);
+    }
+    // Logout from current session
+    public function logout_current(Request $request): JsonResponse
+    {
+        $currentTokenId = $request->user()->currentAccessToken()->id;
+        $delete = $request->user()->tokens()->where('id', $currentTokenId)->delete();
+        return $delete ? response()->json(['message' => 'Logged out from current session'], 200) : response()->json(['message' => 'Failed to logout'], 500);
     }
 
-    public function logout_all()
+    // Logout from other sessions
+    public function logout_others(Request $request): JsonResponse
     {
-        $deleted = Auth::user()->tokens()->delete();
-        return $deleted ? 'Logged out from all sessions successfully' : 'No active session';
+        $currentTokenId = $request->user()->currentAccessToken()->id;
+        $delete = $request->user()->tokens()->whereNot('id', $currentTokenId)->delete();
+        return $delete ? response()->json(['message' => 'Logged out from other sessions'], 200) : response()->json(['message' => 'Failed to logout'], 500);
+    }
+    // Logout from specific session by ID
+    public function logout_session(Request $request, $id): JsonResponse
+    {
+        $user = $request->user();
+        $token = $user->tokens()->where('id', $id)->first();
+        if ($token) {
+            $token->delete();
+            return response()->json(['message' => 'Logged out from the session'], 200);
+        }
+        return response()->json(['message' => 'Session not found'], 404);
     }
 
-    public function register(RegisterRequest $request)
+    // Profile
+
+    public function show_profile(Request $request): JsonResponse
     {
-        $user = User::create($request->validated());
-        return $user;
+        $user = $request->user();
+        return response()->json($user, 200);
     }
 }

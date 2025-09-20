@@ -4,11 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PostStatus extends Model
 {
     /** @use HasFactory<\Database\Factories\PostStatusFactory> */
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     /**
      * The attributes that aren't mass assignable.
@@ -24,6 +26,7 @@ class PostStatus extends Model
      */
     protected $fillable = [
         'type',
+        'user_id',
     ];
 
     /**
@@ -34,4 +37,10 @@ class PostStatus extends Model
     protected $hidden = [
         //
     ];
+
+    // Relationships
+    public function posts(): HasMany
+    {
+        return $this->hasMany(Post::class);
+    }
 }

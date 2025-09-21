@@ -15,7 +15,7 @@ class PostStatusController extends Controller
      */
     public function index()
     {
-        $post_statuses = PostStatus::withCount('posts')->get();
+        $post_statuses = PostStatus::all();
         $json_post_statuses = PostStatusResource::collection($post_statuses);
         return $json_post_statuses;
     }
@@ -47,8 +47,7 @@ class PostStatusController extends Controller
         if (!$exists) {
             return 'Failure: Post not found';
         }
-        $post_status = PostStatus::withCount('posts')->find($postStatus->id);
-        $post_status_json = PostStatusResource::make($post_status);
+        $post_status_json = PostStatusResource::make($postStatus);
         return $post_status_json;
     }
 

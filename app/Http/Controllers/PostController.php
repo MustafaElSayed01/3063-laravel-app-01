@@ -15,7 +15,7 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = Post::with('user')->get();
+        $posts = Post::all();
         $json_posts = PostResource::collection($posts);
         return $json_posts;
     }
@@ -48,7 +48,7 @@ class PostController extends Controller
         if (!$exists) {
             return 'Failure: Post not found';
         }
-        $post = Post::with('user')->find($post->id);
+        $post = $post->load(['post_status', 'user', 'comments']);
         $post_json = PostResource::make($post);
         return $post_json;
     }

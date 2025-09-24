@@ -3,12 +3,10 @@ name: Code Quality
 on:
   pull_request:
     branches: ["main"]
-  push:
-    branches: ["main"]
 
 jobs:
   lint:
-    name: Laravel Pint
+    name: Laravel Pint (Check)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -27,22 +25,34 @@ jobs:
       - name: Run Laravel Pint
         run: vendor/bin/pint --test
 
-  static-analysis:
-    name: PHPStan
+  auto-fix:
+    name: Laravel Pint (Auto Fix)
     runs-on: ubuntu-latest
+    if: ${{ failure() && github.event.pull_request.head.repo.full_name == github.repository }}
+    needs: lint
+    permissions:
+      contents: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
 
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: "8.4"
-          extensions: mbstring, pdo_mysql, bcmath
-          coverage: none
 
       - name: Install Composer dependencies
         run: composer install --prefer-dist --no-progress --no-suggest
 
-      - name: Run PHPStan
-        run: vendor/bin/phpstan analyse --memory-limit=512M
+      - name: Run Pint Auto Fix
+        run: vendor/bin/pint
+
+      - name: Commit and Push Fixes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "chore: apply Pint fixes"
+          git push

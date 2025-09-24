@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ReactionTypeResource;
 use App\Models\ReactionType;
 use App\Http\Requests\StoreReactionTypeRequest;
 use App\Http\Requests\UpdateReactionTypeRequest;
@@ -13,7 +14,9 @@ class ReactionTypeController extends Controller
      */
     public function index()
     {
-        //
+        $reactionTypes = ReactionType::all();
+        $json_reactionTypes = ReactionTypeResource::collection($reactionTypes);
+        return $json_reactionTypes;
     }
 
     /**

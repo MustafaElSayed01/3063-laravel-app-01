@@ -19,10 +19,11 @@ class PostResource extends JsonResource
             'title' => $this->title,
             'content' => $this->body,
 
-            'user' => [
-                'id' => $this->user->id,
-                'name' => $this->user->name,
-            ],
+            'post_status' => $this->post_status->type,
+
+            'user' => UserResource::make($this->whenLoaded('user')),
+
+            'comments' => CommentResource::collection($this->whenLoaded('comments')),
 
             'from' => $this->updated_at->diffForHumans(),
         ];

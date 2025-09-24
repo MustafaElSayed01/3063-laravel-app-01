@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ReplyResource;
 use App\Models\Reply;
 use App\Http\Requests\StoreReplyRequest;
 use App\Http\Requests\UpdateReplyRequest;
@@ -13,8 +14,11 @@ class ReplyController extends Controller
      */
     public function index()
     {
-        //
-    }
+        $replies = Reply::all();
+
+        $replies = ReplyResource::collection($replies);
+
+        return $replies;    }
 
     /**
      * Show the form for creating a new resource.

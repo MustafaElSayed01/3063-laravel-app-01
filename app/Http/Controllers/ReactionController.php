@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ReactionResource;
 use App\Models\Reaction;
 use App\Http\Requests\StoreReactionRequest;
 use App\Http\Requests\UpdateReactionRequest;
@@ -13,8 +14,9 @@ class ReactionController extends Controller
      */
     public function index()
     {
-        //
-    }
+        $reaction = Reaction::all();
+        $json_reaction = ReactionResource::collection($reaction);
+        return $json_reaction;    }
 
     /**
      * Show the form for creating a new resource.

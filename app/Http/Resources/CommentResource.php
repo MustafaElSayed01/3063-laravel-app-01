@@ -20,11 +20,8 @@ class CommentResource extends JsonResource
             'comment_id' => $this->id,
             'comment' => $this->comment,
 
-            'user' => [
-                'id' => $this->user->id,
-                'name' => $this->user->name,
-            ],
-            
+            'user' => UserResource::make($this->whenLoaded('user')),
+
             'from' => $this->created_at->diffForHumans(),
             'last_updated' => $this->updated_at->diffForHumans(),
         ];

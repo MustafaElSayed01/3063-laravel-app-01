@@ -14,6 +14,9 @@ class ReactionResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'reaction_id' => $this->id,
+            
+        ];
     }
 }

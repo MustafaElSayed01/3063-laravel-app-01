@@ -17,7 +17,6 @@ class PostStatusResource extends JsonResource
         return [
             'post_status_id' => $this->id,
             'post_status' => $this->type,
-            'posts_count' => $this->posts_count,
         ];
     }
 }

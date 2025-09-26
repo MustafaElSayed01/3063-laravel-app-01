@@ -11,7 +11,7 @@ class StoreReplyRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,8 @@ class StoreReplyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'reply' => 'required|string|between:1,1000',
+            'comment_id' => 'required|exists:comments,id'
         ];
     }
 }

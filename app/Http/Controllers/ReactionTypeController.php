@@ -32,7 +32,9 @@ class ReactionTypeController extends Controller
      */
     public function store(StoreReactionTypeRequest $request)
     {
-        //
+        $data = $request->validated();
+        $added = ReactionType::create($data);
+        return $added ? 'Success' : 'Failure';
     }
 
     /**
@@ -40,7 +42,13 @@ class ReactionTypeController extends Controller
      */
     public function show(ReactionType $reactionType)
     {
-        //
+        $exists = ReactionType::query()->where('id', $reactionType->id)->exists();
+        if (!$exists) {
+            return 'Failure: Reaction Type not found';
+        }
+        $reactionType = ReactionType::with('reactions')->find($reactionType->id);
+        $reactionType_json = ReactionTypeResource::make($reactionType);
+        return $reactionType_json;
     }
 
     /**
@@ -56,7 +64,9 @@ class ReactionTypeController extends Controller
      */
     public function update(UpdateReactionTypeRequest $request, ReactionType $reactionType)
     {
-        //
+        $new_data = $request->validated();
+        $updated = $reactionType->update($new_data);
+        return $updated ? 'Success' : 'Failure';
     }
 
     /**
@@ -64,6 +74,52 @@ class ReactionTypeController extends Controller
      */
     public function destroy(ReactionType $reactionType)
     {
-        //
+        $exists = ReactionType::query()->where('id', $reactionType->id)->exists();
+        if (!$exists) {
+            return 'Failure: reaction type not found';
+        }
+        $deleted = $reactionType->delete();
+        return $deleted ? 'Success' : 'Failure';
+    }
+    /**
+     * Return a list of soft-deleted reaction types.
+     */
+    public function deleted()
+    {
+        $deleted_reaction_types = ReactionType::query()->onlyTrashed()->get();
+        $json_reaction_types = ReactionTypeResource::collection($deleted_reaction_types);
+        return $json_reaction_types;
+    }
+
+    /**
+     * Restore the specified soft-deleted comment to its original state.
+     *
+     * @param int $id The id of the comment to be restored.
+     * @return string 'Success' if the comment was successfully restored, 'Failure' otherwise.
+     */
+    public function restore($id)
+    {
+        $exists = ReactionType::onlyTrashed()->where('id', $id)->exists();
+        if (!$exists) {
+            return 'Failure: Reaction Type not deleted';
+        }
+        $restored = ReactionType::onlyTrashed()->where('id', $id)->restore();
+        return $restored ? 'Success' : 'Failure';
+    }
+
+    /**
+     * Permanently delete the specified reaction type.
+     *
+     * @param int $id The id of the reaction type to be permanently deleted.
+     * @return string 'Success' if the reaction type was successfully permanently deleted, 'Failure' otherwise.
+     */
+    public function hard_delete($id)
+    {
+        $exists = ReactionType::onlyTrashed()->where('id', $id)->exists();
+        if (!$exists) {
+            return 'Failure: ReactionType not deleted';
+        }
+        $hard_deleted = ReactionType::onlyTrashed()->where('id', $id)->forceDelete();
+        return $hard_deleted ? 'Success' : 'Failure';
     }
 }

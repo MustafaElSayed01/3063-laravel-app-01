@@ -16,7 +16,8 @@ class ReactionController extends Controller
     {
         $reaction = Reaction::all();
         $json_reaction = ReactionResource::collection($reaction);
-        return $json_reaction;    }
+        return $json_reaction;
+    }
 
     /**
      * Show the form for creating a new resource.
@@ -31,7 +32,7 @@ class ReactionController extends Controller
      */
     public function store(StoreReactionRequest $request)
     {
-        //
+        $data = $request->validated();
     }
 
     /**

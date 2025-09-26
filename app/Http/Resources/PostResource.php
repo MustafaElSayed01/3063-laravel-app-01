@@ -24,7 +24,6 @@ class PostResource extends JsonResource
             'user' => UserResource::make($this->whenLoaded('user')),
 
             'comments' => CommentResource::collection($this->whenLoaded('comments')),
-
             'from' => $this->updated_at->diffForHumans(),
         ];
     }

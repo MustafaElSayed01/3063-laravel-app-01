@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\PostStatus;
 use App\Http\Requests\StorePostStatusRequest;
 use App\Http\Requests\UpdatePostStatusRequest;
 use App\Http\Resources\PostStatusResource;
 use App\Models\Post;
+use App\Models\PostStatus;
 
 class PostStatusController extends Controller
 {
@@ -17,6 +17,7 @@ class PostStatusController extends Controller
     {
         $post_statuses = PostStatus::all();
         $json_post_statuses = PostStatusResource::collection($post_statuses);
+
         return $json_post_statuses;
     }
 
@@ -35,6 +36,7 @@ class PostStatusController extends Controller
     {
         $data = $request->validated();
         $added = PostStatus::create($data);
+
         return $added ? 'Success' : 'Failure';
     }
 
@@ -44,10 +46,11 @@ class PostStatusController extends Controller
     public function show(PostStatus $postStatus)
     {
         $exists = PostStatus::query()->where('id', $postStatus->id)->exists();
-        if (!$exists) {
+        if (! $exists) {
             return 'Failure: Post not found';
         }
         $post_status_json = PostStatusResource::make($postStatus);
+
         return $post_status_json;
     }
 
@@ -66,6 +69,7 @@ class PostStatusController extends Controller
     {
         $new_data = $request->validated();
         $updated = $postStatus->update($new_data);
+
         return $updated ? 'Success' : 'Failure';
     }
 
@@ -75,13 +79,14 @@ class PostStatusController extends Controller
     public function destroy(PostStatus $postStatus)
     {
         $exists = PostStatus::query()->where('id', $postStatus->id)->exists();
-        if (!$exists) {
+        if (! $exists) {
             return 'Failure: Post Status not found';
         }
         if (Post::query()->where('post_status_id', $postStatus->id)->exists()) {
             return 'Failure: Cannot delete status with assigned posts';
         }
         $deleted = $postStatus->delete();
+
         return $deleted ? 'Success' : 'Failure';
     }
 
@@ -92,41 +97,44 @@ class PostStatusController extends Controller
     {
         $deleted_posts = PostStatus::query()->onlyTrashed()->get();
         $json_posts = PostStatusResource::collection($deleted_posts);
+
         return $json_posts;
     }
 
     /**
      * Restore the specified soft-deleted Post Status to its original state.
      *
-     * @param int $id The id of the Post Status to be restored.
+     * @param  int  $id  The id of the Post Status to be restored.
      * @return string 'Success' if the Post Status was successfully restored, 'Failure' otherwise.
      */
     public function restore($id)
     {
-        $exists = PostStatus::onlyTrashed()->where('id', $id)->exists();
-        if (!$exists) {
+        $exists = PostStatus::query()->onlyTrashed()->where('id', $id)->exists();
+        if (! $exists) {
             return 'Failure: Post Status not deleted';
         }
-        $restored = PostStatus::onlyTrashed()->where('id', $id)->restore();
+        $restored = PostStatus::query()->onlyTrashed()->where('id', $id)->restore();
+
         return $restored ? 'Success' : 'Failure';
     }
 
     /**
      * Permanently delete the specified Post Status.
      *
-     * @param int $id The id of the Post Status to be permanently deleted.
+     * @param  int  $id  The id of the Post Status to be permanently deleted.
      * @return string 'Success' if the Post Status was successfully permanently deleted, 'Failure' otherwise.
      */
     public function hard_delete($id)
     {
-        $exists = PostStatus::onlyTrashed()->where('id', $id)->exists();
-        if (!$exists) {
+        $exists = PostStatus::query()->onlyTrashed()->where('id', $id)->exists();
+        if (! $exists) {
             return 'Failure: Post Status not deleted';
         }
         if (Post::query()->where('post_status_id', $id)->exists()) {
             return 'Failure: Cannot delete status with assigned posts';
         }
-        $hard_deleted = PostStatus::onlyTrashed()->where('id', $id)->forceDelete();
+        $hard_deleted = PostStatus::query()->onlyTrashed()->where('id', $id)->forceDelete();
+
         return $hard_deleted ? 'Success' : 'Failure';
     }
 }

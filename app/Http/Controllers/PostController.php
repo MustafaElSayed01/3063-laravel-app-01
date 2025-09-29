@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\PostResource;
-use App\Models\Post;
 use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
-use Illuminate\Http\Request;
+use App\Http\Resources\PostResource;
+use App\Models\Post;
 
 class PostController extends Controller
 {
@@ -17,6 +16,7 @@ class PostController extends Controller
     {
         $posts = Post::all();
         $json_posts = PostResource::collection($posts);
+
         return $json_posts;
     }
 
@@ -36,6 +36,7 @@ class PostController extends Controller
         $data = $request->validated();
         $data['user_id'] = $request->user()->id;
         $added = Post::create($data);
+
         return $added ? 'Success' : 'Failure';
     }
 
@@ -45,11 +46,12 @@ class PostController extends Controller
     public function show(Post $post)
     {
         $exists = Post::query()->where('id', $post->id)->exists();
-        if (!$exists) {
+        if (! $exists) {
             return 'Failure: Post not found';
         }
         $post = $post->load(['post_status', 'user', 'comments']);
         $post_json = PostResource::make($post);
+
         return $post_json;
     }
 
@@ -68,6 +70,7 @@ class PostController extends Controller
     {
         $new_data = $request->validated();
         $updated = $post->update($new_data);
+
         return $updated ? 'Success' : 'Failure';
     }
 
@@ -77,10 +80,11 @@ class PostController extends Controller
     public function destroy(Post $post)
     {
         $exists = Post::query()->where('id', $post->id)->exists();
-        if (!$exists) {
+        if (! $exists) {
             return 'Failure: Post not found';
         }
         $deleted = $post->delete();
+
         return $deleted ? 'Success' : 'Failure';
     }
 
@@ -91,6 +95,7 @@ class PostController extends Controller
     {
         $posts = Post::query()->inRandomOrder()->take(5)->get();
         $json_posts = PostResource::collection($posts);
+
         return $json_posts;
     }
 
@@ -101,38 +106,41 @@ class PostController extends Controller
     {
         $deleted_posts = Post::query()->onlyTrashed()->get();
         $json_posts = PostResource::collection($deleted_posts);
+
         return $json_posts;
     }
 
     /**
      * Restore the specified soft-deleted post to its original state.
      *
-     * @param int $id The id of the post to be restored.
+     * @param  int  $id  The id of the post to be restored.
      * @return string 'Success' if the post was successfully restored, 'Failure' otherwise.
      */
     public function restore($id)
     {
-        $exists = Post::onlyTrashed()->where('id', $id)->exists();
-        if (!$exists) {
+        $exists = Post::query()->onlyTrashed()->where('id', $id)->exists();
+        if (! $exists) {
             return 'Failure: Post not deleted';
         }
-        $restored = Post::onlyTrashed()->where('id', $id)->restore();
+        $restored = Post::query()->onlyTrashed()->where('id', $id)->restore();
+
         return $restored ? 'Success' : 'Failure';
     }
 
     /**
      * Permanently delete the specified post.
      *
-     * @param int $id The id of the post to be permanently deleted.
+     * @param  int  $id  The id of the post to be permanently deleted.
      * @return string 'Success' if the post was successfully permanently deleted, 'Failure' otherwise.
      */
     public function hard_delete($id)
     {
-        $exists = Post::onlyTrashed()->where('id', $id)->exists();
-        if (!$exists) {
+        $exists = Post::query()->onlyTrashed()->where('id', $id)->exists();
+        if (! $exists) {
             return 'Failure: Post not deleted';
         }
-        $hard_deleted = Post::onlyTrashed()->where('id', $id)->forceDelete();
+        $hard_deleted = Post::query()->onlyTrashed()->where('id', $id)->forceDelete();
+
         return $hard_deleted ? 'Success' : 'Failure';
     }
 }

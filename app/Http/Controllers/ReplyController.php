@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\ReplyResource;
-use App\Models\Reply;
 use App\Http\Requests\StoreReplyRequest;
 use App\Http\Requests\UpdateReplyRequest;
+use App\Http\Resources\ReplyResource;
+use App\Models\Reply;
 
 class ReplyController extends Controller
 {
@@ -16,6 +16,7 @@ class ReplyController extends Controller
     {
         $replies = Reply::all();
         $replies = ReplyResource::collection($replies);
+
         return $replies;
     }
 
@@ -35,6 +36,7 @@ class ReplyController extends Controller
         $data = $request->validated();
         $data['user_id'] = $request->user()->id;
         $added = Reply::create($data);
+
         return $added ? 'Success' : 'Failure';
     }
 
@@ -44,11 +46,12 @@ class ReplyController extends Controller
     public function show(Reply $reply)
     {
         $exists = Reply::query()->where('id', $reply->id)->exists();
-        if (!$exists) {
+        if (! $exists) {
             return 'Failure: Reply not found';
         }
         $reply = Reply::with('user')->find($reply->id);
         $reply_json = ReplyResource::make($reply);
+
         return $reply_json;
     }
 
@@ -67,6 +70,7 @@ class ReplyController extends Controller
     {
         $new_data = $request->validated();
         $updated = $reply->update($new_data);
+
         return $updated ? 'Success' : 'Failure';
     }
 
@@ -76,12 +80,14 @@ class ReplyController extends Controller
     public function destroy(Reply $reply)
     {
         $exists = Reply::query()->where('id', $reply->id)->exists();
-        if (!$exists) {
+        if (! $exists) {
             return 'Failure: Reply not found';
         }
         $deleted = $reply->delete();
+
         return $deleted ? 'Success' : 'Failure';
     }
+
     /**
      * Return a list of soft-deleted replies.
      */
@@ -89,38 +95,41 @@ class ReplyController extends Controller
     {
         $deleted_replies = Reply::query()->onlyTrashed()->get();
         $json_replies = ReplyResource::collection($deleted_replies);
+
         return $json_replies;
     }
 
     /**
      * Restore the specified soft-deleted reply to its original state.
      *
-     * @param int $id The id of the reply to be restored.
+     * @param  int  $id  The id of the reply to be restored.
      * @return string 'Success' if the reply was successfully restored, 'Failure' otherwise.
      */
     public function restore($id)
     {
-        $exists = Reply::onlyTrashed()->where('id', $id)->exists();
-        if (!$exists) {
+        $exists = Reply::query()->onlyTrashed()->where('id', $id)->exists();
+        if (! $exists) {
             return 'Failure: Reply not deleted';
         }
-        $restored = Reply::onlyTrashed()->where('id', $id)->restore();
+        $restored = Reply::query()->onlyTrashed()->where('id', $id)->restore();
+
         return $restored ? 'Success' : 'Failure';
     }
 
     /**
      * Permanently delete the specified reply.
      *
-     * @param int $id The id of the reply to be permanently deleted.
+     * @param  int  $id  The id of the reply to be permanently deleted.
      * @return string 'Success' if the reply was successfully permanently deleted, 'Failure' otherwise.
      */
     public function hard_delete($id)
     {
-        $exists = Reply::onlyTrashed()->where('id', $id)->exists();
-        if (!$exists) {
+        $exists = Reply::query()->onlyTrashed()->where('id', $id)->exists();
+        if (! $exists) {
             return 'Failure: Reply not deleted';
         }
-        $hard_deleted = Reply::onlyTrashed()->where('id', $id)->forceDelete();
+        $hard_deleted = Reply::query()->onlyTrashed()->where('id', $id)->forceDelete();
+
         return $hard_deleted ? 'Success' : 'Failure';
     }
 }

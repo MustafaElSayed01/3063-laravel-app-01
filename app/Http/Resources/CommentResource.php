@@ -15,15 +15,14 @@ class CommentResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'post_id' => $this->post->id,
-
+            'post_id' => $this->post_id,
             'comment_id' => $this->id,
             'comment' => $this->comment,
-
-            'user' => UserResource::make($this->whenLoaded('user')),
-
-            'from' => $this->created_at->diffForHumans(),
-            'last_updated' => $this->updated_at->diffForHumans(),
+            'commented_at' => $this->created_at->diffForHumans(),
+            'last_update' => $this->updated_at->diffForHumans(),
+            'commented_by' => UserResource::make($this->whenLoaded('user')),
+            'comment_replies' => ReplyResource::collection($this->whenLoaded('replies')),
+            'comment_reactions' => ReactionResource::collection($this->whenLoaded('reactions')),
         ];
     }
 }

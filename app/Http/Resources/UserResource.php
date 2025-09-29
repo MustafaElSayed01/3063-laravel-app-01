@@ -20,6 +20,8 @@ class UserResource extends JsonResource
             'user_email' => $this->email,
             'user_mobile' => $this->mobile,
             'user_roles' => $this->roles,
+            'joined' => $this->created_at->diffForHumans(),
+            'user_posts' => PostResource::collection($this->whenLoaded('posts')),
         ];
     }
 }

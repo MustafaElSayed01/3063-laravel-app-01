@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\UserResource;
-use App\Models\User;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
+use App\Http\Resources\UserResource;
+use App\Models\User;
 
 class UserController extends Controller
 {
@@ -16,6 +16,7 @@ class UserController extends Controller
     {
         $users = User::all();
         $users = UserResource::collection($users);
+
         return $users;
     }
 
@@ -34,6 +35,7 @@ class UserController extends Controller
     {
         $data = $request->validated();
         $added = User::create($data);
+
         return $added ? 'Success' : 'Failure';
     }
 
@@ -43,11 +45,12 @@ class UserController extends Controller
     public function show(User $user)
     {
         $exists = User::query()->where('id', $user->id)->exists();
-        if (!$exists) {
+        if (! $exists) {
             return 'Failure: User not found';
         }
         $user = User::with('posts', 'comments', 'replies')->find($user->id);
         $user_json = UserResource::make($user);
+
         return $user_json;
     }
 
@@ -66,6 +69,7 @@ class UserController extends Controller
     {
         $new_data = $request->validated();
         $updated = $user->update($new_data);
+
         return $updated ? 'Success' : 'Failure';
     }
 
@@ -75,10 +79,11 @@ class UserController extends Controller
     public function destroy(User $user)
     {
         $exists = User::query()->where('id', $user->id)->exists();
-        if (!$exists) {
+        if (! $exists) {
             return 'Failure: User not found';
         }
         $deleted = $user->delete();
+
         return $deleted ? 'Success' : 'Failure';
     }
 
@@ -89,38 +94,41 @@ class UserController extends Controller
     {
         $deleted_users = User::query()->onlyTrashed()->get();
         $json_users = UserResource::collection($deleted_users);
+
         return $json_users;
     }
 
     /**
      * Restore the specified soft-deleted user to its original state.
      *
-     * @param int $id The id of the user to be restored.
+     * @param  int  $id  The id of the user to be restored.
      * @return string 'Success' if the user was successfully restored, 'Failure' otherwise.
      */
     public function restore($id)
     {
-        $exists = User::onlyTrashed()->where('id', $id)->exists();
-        if (!$exists) {
+        $exists = User::query()->onlyTrashed()->where('id', $id)->exists();
+        if (! $exists) {
             return 'Failure: User not deleted';
         }
-        $restored = User::onlyTrashed()->where('id', $id)->restore();
+        $restored = User::query()->onlyTrashed()->where('id', $id)->restore();
+
         return $restored ? 'Success' : 'Failure';
     }
 
     /**
      * Permanently delete the specified user.
      *
-     * @param int $id The id of the user to be permanently deleted.
+     * @param  int  $id  The id of the user to be permanently deleted.
      * @return string 'Success' if the user was successfully permanently deleted, 'Failure' otherwise.
      */
     public function hard_delete($id)
     {
-        $exists = User::onlyTrashed()->where('id', $id)->exists();
-        if (!$exists) {
+        $exists = User::query()->onlyTrashed()->where('id', $id)->exists();
+        if (! $exists) {
             return 'Failure: User not deleted';
         }
-        $hard_deleted = User::onlyTrashed()->where('id', $id)->forceDelete();
+        $hard_deleted = User::query()->onlyTrashed()->where('id', $id)->forceDelete();
+
         return $hard_deleted ? 'Success' : 'Failure';
     }
 }

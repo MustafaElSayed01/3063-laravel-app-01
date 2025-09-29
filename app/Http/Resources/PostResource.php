@@ -16,15 +16,14 @@ class PostResource extends JsonResource
     {
         return [
             'post_id' => $this->id,
-            'title' => $this->title,
-            'content' => $this->body,
-
+            'post_title' => $this->title,
+            'post_content' => $this->body,
             'post_status' => $this->post_status->type,
-
-            'user' => UserResource::make($this->whenLoaded('user')),
-
-            'comments' => CommentResource::collection($this->whenLoaded('comments')),
-            'from' => $this->updated_at->diffForHumans(),
+            'posted_at' => $this->created_at->diffForHumans(),
+            'last_update' => $this->updated_at->diffForHumans(),
+            'posted_by' => UserResource::make($this->whenLoaded('user')),
+            'post_comments' => CommentResource::collection($this->whenLoaded('comments')),
+            'post_reactions' => ReactionResource::collection($this->whenLoaded('reactions')),
         ];
     }
 }

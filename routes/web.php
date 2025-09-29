@@ -1,15 +1,13 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\CustomerController;
-use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('init', function () {
+Route::get('models_init', function () {
     $models = [
         'User',
         'ReactionType',
@@ -25,10 +23,28 @@ Route::get('init', function () {
     }
 });
 
+Route::get('resources_init', function () {
+
+    $models = [
+        'User',
+        'ReactionType',
+        'PostStatus',
+        'Post',
+        'Comment',
+        'Reply',
+        'Reaction',
+    ];
+
+    foreach ($models as $model) {
+        Artisan::call('make:resource', ['name' => $model.'Resource']);
+        Artisan::call('make:resource', ['name' => $model.'Collection']);
+    }
+});
+
 Route::view('about', 'static.about');
 
 Route::view('contact-us', 'static.contact');
 
 Route::view('privacy-policy', 'static.privacy-policy');
 
-Route::fallback(fn() => abort(404));
+Route::fallback(fn () => abort(404));

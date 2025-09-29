@@ -15,11 +15,13 @@ class ReplyResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
+            'comment_id' => $this->comment_id,
             'reply_id' => $this->id,
             'reply' => $this->reply,
-            'comment_id' => $this->comment_id,
-            'user' => UserResource::make($this->whenLoaded('user')),
-            'from' => $this->created_at->diffForHumans(),
-            'last_updated' => $this->updated_at->diffForHumans(),
-        ];    }
+            'replied_at' => $this->created_at->diffForHumans(),
+            'last_update' => $this->updated_at->diffForHumans(),
+            'replied_by' => UserResource::make($this->whenLoaded('user')),
+            'reply_reactions' => ReactionResource::collection($this->whenLoaded('reactions')),
+        ];
+    }
 }

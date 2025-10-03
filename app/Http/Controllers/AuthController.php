@@ -2,22 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\LoginRequest;
-use App\Http\Requests\RegisterRequest;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
-
     /**
      * Web login
      *
      * Validate login credentials and return user with token if valid
      *
-     * @param LoginRequest $request
      * @return \Illuminate\Http\Response
      */
     public function web_login(LoginRequest $request): JsonResponse
@@ -28,18 +25,18 @@ class AuthController extends Controller
             $user = Auth::user();
             $token = $user->createToken('web');
             $user['token'] = $token->plainTextToken;
+
             return response()->json($user, 200);
         }
+
         return response()->json(['message' => 'Unauthorized'], 401);
     }
-
 
     /**
      * Mobile login
      *
      * Validate login credentials and return user with token if valid
      *
-     * @param LoginRequest $request
      * @return \Illuminate\Http\Response
      */
     public function mobile_login(LoginRequest $request): JsonResponse
@@ -50,8 +47,10 @@ class AuthController extends Controller
             $user = Auth::user();
             $token = $user->createToken('mobile');
             $user['token'] = $token->plainTextToken;
+
             return response()->json($user, 200);
         }
+
         return response()->json(['message' => 'Unauthorized'], 401);
     }
 
@@ -61,6 +60,7 @@ class AuthController extends Controller
     {
         $user = $request->user();
         $tokens = $user->tokens;
+
         return response()->json($tokens, 200);
     }
 
@@ -73,6 +73,7 @@ class AuthController extends Controller
         if ($currentToken) {
             return response()->json($currentToken, 200);
         }
+
         return response()->json(['message' => 'No current session found'], 404);
     }
 
@@ -85,8 +86,10 @@ class AuthController extends Controller
         if ($otherTokens->isNotEmpty()) {
             return response()->json($otherTokens, 200);
         }
+
         return response()->json(['message' => 'No other sessions found'], 404);
     }
+
     // Show specific session by ID for current user
     public function show_session(Request $request, $id): JsonResponse
     {
@@ -95,6 +98,7 @@ class AuthController extends Controller
         if ($token) {
             return response()->json($token, 200);
         }
+
         return response()->json(['message' => 'Session not found'], 404);
     }
 
@@ -103,13 +107,16 @@ class AuthController extends Controller
     public function logout_all(Request $request): JsonResponse
     {
         $delete = $request->user()->tokens()->delete();
+
         return $delete ? response()->json(['message' => 'Logged out from all sessions'], 200) : response()->json(['message' => 'Failed to logout'], 500);
     }
+
     // Logout from current session
     public function logout_current(Request $request): JsonResponse
     {
         $currentTokenId = $request->user()->currentAccessToken()->id;
         $delete = $request->user()->tokens()->where('id', $currentTokenId)->delete();
+
         return $delete ? response()->json(['message' => 'Logged out from current session'], 200) : response()->json(['message' => 'Failed to logout'], 500);
     }
 
@@ -118,8 +125,10 @@ class AuthController extends Controller
     {
         $currentTokenId = $request->user()->currentAccessToken()->id;
         $delete = $request->user()->tokens()->whereNot('id', $currentTokenId)->delete();
+
         return $delete ? response()->json(['message' => 'Logged out from other sessions'], 200) : response()->json(['message' => 'Failed to logout'], 500);
     }
+
     // Logout from specific session by ID
     public function logout_session(Request $request, $id): JsonResponse
     {
@@ -127,8 +136,10 @@ class AuthController extends Controller
         $token = $user->tokens()->where('id', $id)->first();
         if ($token) {
             $token->delete();
+
             return response()->json(['message' => 'Logged out from the session'], 200);
         }
+
         return response()->json(['message' => 'Session not found'], 404);
     }
 
@@ -137,6 +148,7 @@ class AuthController extends Controller
     public function show_profile(Request $request): JsonResponse
     {
         $user = $request->user();
+
         return response()->json($user, 200);
     }
 }

@@ -20,7 +20,7 @@ class DatabaseSeeder extends Seeder
             PostSeeder::class,
             CommentSeeder::class,
             ReplySeeder::class,
-            ReactionSeeder::class
+            ReactionSeeder::class,
         ]);
     }
 }

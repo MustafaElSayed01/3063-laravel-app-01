@@ -19,8 +19,8 @@ class Comment extends Model
      *
      * @var array<int, string>
      */
-
     protected $guarded = [];
+
     /**
      * The attributes that are mass assignable.
      *
@@ -56,6 +56,7 @@ class Comment extends Model
     {
         return $this->morphMany(Reaction::class, 'reactable');
     }
+
     public function replies(): HasMany
     {
         return $this->hasMany(Reply::class);

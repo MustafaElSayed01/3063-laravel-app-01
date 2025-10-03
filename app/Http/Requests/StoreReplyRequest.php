@@ -23,7 +23,7 @@ class StoreReplyRequest extends FormRequest
     {
         return [
             'reply' => 'required|string|between:1,1000',
-            'comment_id' => 'required|exists:comments,id'
+            'comment_id' => 'required|exists:comments,id',
         ];
     }
 }

@@ -22,6 +22,9 @@ class UserResource extends JsonResource
             'user_roles' => $this->roles,
             'joined' => $this->created_at->diffForHumans(),
             'user_posts' => PostResource::collection($this->whenLoaded('posts')),
+            'user_comments' => CommentResource::collection($this->whenLoaded('comments')),
+            'user_replies' => ReplyResource::collection($this->whenLoaded('replies')),
+            'user_reactions' => ReactionResource::collection($this->whenLoaded('reactions')),
         ];
     }
 }

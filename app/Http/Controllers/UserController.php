@@ -14,7 +14,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::all();
+        $users = User::with('posts', 'comments', 'replies', 'reactions')->get();
         $users = UserResource::collection($users);
 
         return $users;

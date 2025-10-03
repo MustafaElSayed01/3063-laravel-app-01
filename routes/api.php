@@ -1,17 +1,14 @@
 <?php
 
-use App\Http\Controllers\{
-    AuthController,
-    CommentController,
-    PostController,
-    PostStatusController,
-    ReactionController,
-    ReactionTypeController,
-    ReplyController,
-    UserController
-};
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CommentController;
+use App\Http\Controllers\PostController;
+use App\Http\Controllers\PostStatusController;
+use App\Http\Controllers\ReactionController;
+use App\Http\Controllers\ReactionTypeController;
+use App\Http\Controllers\ReplyController;
+use App\Http\Controllers\UserController;
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -23,7 +20,6 @@ Route::prefix('auth')->controller(AuthController::class)->group(function () {
     Route::post('mobile-login', 'mobile_login');
     Route::post('register', 'register');
 });
-
 
 Route::middleware(['auth:sanctum'])->group(function () {
 

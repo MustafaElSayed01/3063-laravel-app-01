@@ -16,7 +16,11 @@ class ReactionResource extends JsonResource
     {
         return [
             'reaction_id' => $this->id,
-            
+            'reactable_type' => $this->reactable_type, // Post, Comment, etc.
+            'reactable_id' => $this->reactable_id,
+            'user' => UserResource::collection($this->whenLoaded('user')),
+            'reaction_type' => ReactionTypeResource::collection($this->whenLoaded('reactionType')),
+            'reacted_at' => $this->created_at->diffForHumans(),
         ];
     }
 }

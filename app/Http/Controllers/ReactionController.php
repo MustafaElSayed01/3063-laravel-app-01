@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\ReactionResource;
-use App\Models\Reaction;
 use App\Http\Requests\StoreReactionRequest;
 use App\Http\Requests\UpdateReactionRequest;
+use App\Http\Resources\ReactionResource;
+use App\Models\Reaction;
 
 class ReactionController extends Controller
 {
@@ -16,6 +16,7 @@ class ReactionController extends Controller
     {
         $reaction = Reaction::all();
         $json_reaction = ReactionResource::collection($reaction);
+
         return $json_reaction;
     }
 

@@ -59,8 +59,10 @@
         "test": [
             "@php artisan config:clear --ansi",
             "@php artisan test"
-        ]
-    },
+        ],
+        "pint": "vendor/bin/pint",
+        "phpstan": "vendor/bin/phpstan analyse"
+        },
     "extra": {
         "laravel": {
             "dont-discover": []

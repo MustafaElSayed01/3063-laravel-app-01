@@ -22,7 +22,7 @@ class UpdateReactionTypeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'type' => 'required|string|between:1,30'
+            'type' => 'required|string|between:1,30',
         ];
     }
 }

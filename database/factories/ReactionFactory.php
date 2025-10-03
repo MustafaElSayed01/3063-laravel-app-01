@@ -2,14 +2,12 @@
 
 namespace Database\Factories;
 
-use App\Models\{
-    Comment,
-    Post,
-    Reaction,
-    ReactionType,
-    Reply,
-    User
-};
+use App\Models\Comment;
+use App\Models\Post;
+use App\Models\Reaction;
+use App\Models\ReactionType;
+use App\Models\Reply;
+use App\Models\User;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -36,11 +34,10 @@ class ReactionFactory extends Factory
             'reply' => Reply::inRandomOrder()->first()->id,
         };
 
-        $exists = Reaction::
-            where('user_id', $user_id)->
+        $exists = Reaction::where('user_id', $user_id)->
             where('reactable_type', $reactable_type)->
             where('reactable_id', $reactable_id)
-            ->get();
+                ->get();
 
         if ($exists->count() > 0) {
             return $this->definition();

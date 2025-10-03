@@ -1,6 +1,3 @@
-includes:
-    - vendor/phpstan/phpstan/extension.neon
-
 parameters:
     level: 6 # 0 = loose, 9 = max strictness, 6 is a good middle ground
     paths:
@@ -8,6 +5,5 @@ parameters:
         - database
     ignoreErrors:
         - '#Call to an undefined method Illuminate\\Support\\.*#' # Ignore some common Laravel dynamic methods
-    checkMissingIterableValueType: false
     reportUnmatchedIgnoredErrors: true
     inferPrivatePropertyTypeFromConstructor: true

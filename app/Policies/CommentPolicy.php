@@ -3,11 +3,25 @@
 namespace App\Policies;
 
 use App\Models\Comment;
+use App\Models\Post;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class CommentPolicy
 {
+    private function hasAccess(User $user, Comment $comment)
+    {
+        // Check if the user is the owner of the comment
+        $isOwner = $user->id === $comment->user_id;
+
+        // Check if the user is the owner of the post that has the comment
+        $post = Post::where('id', $comment->post_id)->first();
+
+        // Check if the user is the owner of the post
+        $isPostOwner = $user->id === $post->user_id;
+
+        return $isOwner || $isPostOwner;
+    }
+
     /**
      * Determine whether the user can view any models.
      */
@@ -21,7 +35,7 @@ class CommentPolicy
      */
     public function view(User $user, Comment $comment): bool
     {
-        return false;
+        return self::hasAccess($user, $comment);
     }
 
     /**
@@ -37,7 +51,7 @@ class CommentPolicy
      */
     public function update(User $user, Comment $comment): bool
     {
-        return false;
+        return self::hasAccess($user, $comment);
     }
 
     /**
@@ -45,7 +59,7 @@ class CommentPolicy
      */
     public function delete(User $user, Comment $comment): bool
     {
-        return false;
+        return self::hasAccess($user, $comment);
     }
 
     /**
@@ -53,7 +67,7 @@ class CommentPolicy
      */
     public function restore(User $user, Comment $comment): bool
     {
-        return false;
+        return self::hasAccess($user, $comment);
     }
 
     /**
@@ -61,6 +75,6 @@ class CommentPolicy
      */
     public function forceDelete(User $user, Comment $comment): bool
     {
-        return false;
+        return self::hasAccess($user, $comment);
     }
 }

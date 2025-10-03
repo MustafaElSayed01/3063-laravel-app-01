@@ -6,6 +6,7 @@ use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use Illuminate\Support\Facades\Gate;
 
 class UserController extends Controller
 {
@@ -14,7 +15,8 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::with('posts', 'comments', 'replies', 'reactions')->get();
+        Gate::authorize('viewAny', User::class);
+        $users = User::all();
         $users = UserResource::collection($users);
 
         return $users;

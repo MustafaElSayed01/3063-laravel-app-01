@@ -14,10 +14,10 @@ class CommentController extends Controller
      */
     public function index()
     {
-        $comments = Comment::with('user')->get();
-        $json_comments = CommentResource::collection($comments);
+        $this->authorize('viewAny', arguments: Comment::class);
+        $comments = Comment::all();
 
-        return $json_comments;
+        return CommentResource::collection($comments);
     }
 
     /**
@@ -33,6 +33,7 @@ class CommentController extends Controller
      */
     public function store(StoreCommentRequest $request)
     {
+        $this->authorize('create', Comment::class);
         $data = $request->validated();
         $data['user_id'] = $request->user()->id;
         $added = Comment::create($data);
@@ -45,14 +46,11 @@ class CommentController extends Controller
      */
     public function show(Comment $comment)
     {
-        $exists = Comment::query()->where('id', $comment->id)->exists();
-        if (! $exists) {
-            return 'Failure: Comment not found';
-        }
-        $comment = Comment::with('user')->find($comment->id);
-        $comment_json = CommentResource::make($comment);
+        $this->authorize('view', $comment);
 
-        return $comment_json;
+        $comment->load(['post', 'user', 'replies', 'reactions']);
+
+        return CommentResource::make($comment);
     }
 
     /**
@@ -68,6 +66,7 @@ class CommentController extends Controller
      */
     public function update(UpdateCommentRequest $request, Comment $comment)
     {
+        $this->authorize('update', $comment);
         $new_data = $request->validated();
         $updated = $comment->update($new_data);
 
@@ -79,10 +78,8 @@ class CommentController extends Controller
      */
     public function destroy(Comment $comment)
     {
-        $exists = Comment::query()->where('id', $comment->id)->exists();
-        if (! $exists) {
-            return 'Failure: Comment not found';
-        }
+        $this->authorize('delete', $comment);
+
         $deleted = $comment->delete();
 
         return $deleted ? 'Success' : 'Failure';
@@ -93,6 +90,7 @@ class CommentController extends Controller
      */
     public function deleted()
     {
+        $this->authorize('viewAny', Comment::class);
         $deleted_comments = Comment::query()->onlyTrashed()->get();
         $json_comments = CommentResource::collection($deleted_comments);
 
@@ -107,10 +105,8 @@ class CommentController extends Controller
      */
     public function restore($id)
     {
-        $exists = Comment::query()->onlyTrashed()->where('id', $id)->exists();
-        if (! $exists) {
-            return 'Failure: Comment not deleted';
-        }
+        $this->authorize('restore', Comment::class);
+
         $restored = Comment::query()->onlyTrashed()->where('id', $id)->restore();
 
         return $restored ? 'Success' : 'Failure';
@@ -122,14 +118,12 @@ class CommentController extends Controller
      * @param  int  $id  The id of the comment to be permanently deleted.
      * @return string 'Success' if the comment was successfully permanently deleted, 'Failure' otherwise.
      */
-    public function hard_delete($id)
+    public function force_delete($id)
     {
-        $exists = Comment::query()->onlyTrashed()->where('id', $id)->exists();
-        if (! $exists) {
-            return 'Failure: Comment not deleted';
-        }
-        $hard_deleted = Comment::query()->onlyTrashed()->where('id', $id)->forceDelete();
+        $this->authorize('forceDelete', Comment::class);
 
-        return $hard_deleted ? 'Success' : 'Failure';
+        $force_deleted = Comment::query()->onlyTrashed()->where('id', $id)->forceDelete();
+
+        return $force_deleted ? 'Success' : 'Failure';
     }
 }

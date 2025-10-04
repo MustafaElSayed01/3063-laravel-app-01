@@ -3,7 +3,6 @@
 namespace App\Policies;
 
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class UserPolicy
 {
@@ -12,16 +11,7 @@ class UserPolicy
      */
     public function viewAny(User $user): bool
     {
-        $route_roles = [
-            'admin',
-            'show_users'
-        ];
-
-        $user_roles = auth()->user()->currentAccessToken()->abilities;
-
-        $has_role = array_intersect($route_roles, $user_roles);
-
-        return count($has_role) > 0;
+        return $user->hasAbility('users:viewAny', ['admin', 'manager']);
     }
 
     /**
@@ -29,7 +19,8 @@ class UserPolicy
      */
     public function view(User $user, User $model): bool
     {
-        return false;
+        return $user->hasAbility('users:view', ['admin', 'manager'])
+            || ($user->hasAbility('users:view', ['user']) && $user->id === $model->id);
     }
 
     /**
@@ -37,7 +28,7 @@ class UserPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return $user->hasAbility('users:create', ['admin']);
     }
 
     /**
@@ -45,7 +36,9 @@ class UserPolicy
      */
     public function update(User $user, User $model): bool
     {
-        return false;
+        return $user->hasAbility('users:update', ['admin'])
+            || ($user->hasAbility('users:update', ['manager']) && $model->role !== 'admin')
+            || ($user->hasAbility('users:update', ['user']) && $user->id === $model->id);
     }
 
     /**
@@ -53,7 +46,8 @@ class UserPolicy
      */
     public function delete(User $user, User $model): bool
     {
-        return false;
+        return $user->hasAbility('users:delete', ['admin'])
+            || ($user->hasAbility('users:delete', ['user']) && $user->id === $model->id);
     }
 
     /**
@@ -61,7 +55,7 @@ class UserPolicy
      */
     public function restore(User $user, User $model): bool
     {
-        return false;
+        return $user->hasAbility('users:restore', ['admin']);
     }
 
     /**
@@ -69,6 +63,6 @@ class UserPolicy
      */
     public function forceDelete(User $user, User $model): bool
     {
-        return false;
+        return $user->hasAbility('users:forceDelete', ['admin']);
     }
 }

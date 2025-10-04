@@ -25,52 +25,51 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // Posts
     Route::prefix('posts')->controller(PostController::class)->group(function () {
-        Route::get('sample', 'random');
         Route::get('deleted', 'deleted');
         Route::get('restore/{id}', 'restore');
-        Route::delete('hard-delete/{id}', 'hard_delete');
+        Route::delete('force-delete/{id}', 'force_delete');
     });
 
     // Comments
     Route::prefix('comments')->controller(CommentController::class)->group(function () {
         Route::get('deleted', 'deleted');
         Route::get('restore/{id}', 'restore');
-        Route::delete('hard-delete/{id}', 'hard_delete');
+        Route::delete('force-delete/{id}', 'force_delete');
     });
 
     // Replies
     Route::prefix('replies')->controller(ReplyController::class)->group(function () {
         Route::get('deleted', 'deleted');
         Route::get('restore/{id}', 'restore');
-        Route::delete('hard-delete/{id}', 'hard_delete');
+        Route::delete('force-delete/{id}', 'force_delete');
     });
 
     // Users
     Route::prefix('users')->controller(UserController::class)->group(function () {
         Route::get('deleted', 'deleted');
         Route::get('restore/{id}', 'restore');
-        Route::delete('hard-delete/{id}', 'hard_delete');
+        Route::delete('force-delete/{id}', 'force_delete');
     });
 
     // Reactions
     Route::prefix('reactions')->controller(ReactionController::class)->group(function () {
         Route::get('deleted', 'deleted');
         Route::get('restore/{id}', 'restore');
-        Route::delete('hard-delete/{id}', 'hard_delete');
+        Route::delete('force-delete/{id}', 'force_delete');
     });
 
     // Post-Statuses
     Route::prefix('post-statuses')->controller(PostStatusController::class)->group(function () {
         Route::get('deleted', 'deleted');
         Route::get('restore/{id}', 'restore');
-        Route::delete('hard-delete/{id}', 'hard_delete');
+        Route::delete('force-delete/{id}', 'force_delete');
     });
 
     // Reaction-Types
     Route::prefix('reaction-types')->controller(ReactionTypeController::class)->group(function () {
         Route::get('deleted', 'deleted');
         Route::get('restore/{id}', 'restore');
-        Route::delete('hard-delete/{id}', 'hard_delete');
+        Route::delete('force-delete/{id}', 'force_delete');
     });
 
     // Posts, comments, reactions, users, replies

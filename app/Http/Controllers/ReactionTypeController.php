@@ -121,14 +121,14 @@ class ReactionTypeController extends Controller
      * @param  int  $id  The id of the reaction type to be permanently deleted.
      * @return string 'Success' if the reaction type was successfully permanently deleted, 'Failure' otherwise.
      */
-    public function hard_delete($id)
+    public function force_delete($id)
     {
         $exists = ReactionType::query()->onlyTrashed()->where('id', $id)->exists();
         if (! $exists) {
             return 'Failure: ReactionType not deleted';
         }
-        $hard_deleted = ReactionType::query()->onlyTrashed()->where('id', $id)->forceDelete();
+        $force_deleted = ReactionType::query()->onlyTrashed()->where('id', $id)->forceDelete();
 
-        return $hard_deleted ? 'Success' : 'Failure';
+        return $force_deleted ? 'Success' : 'Failure';
     }
 }

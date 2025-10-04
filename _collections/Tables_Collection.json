@@ -1,8 +1,10 @@
 {
     "info": {
-        "_postman_id": "multi-collection",
+        "_postman_id": "f304a91e-1dba-4f30-b765-f29d23ab19cb",
         "name": "Tables Collection",
-        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "_exporter_id": "48220399",
+        "_collection_link": "https://moda01148990430-8219783.postman.co/workspace/MoDa-R4BIA's-Workspace~7af2d1d9-30f7-4db5-8e31-09ba58b18a2c/collection/48220399-f304a91e-1dba-4f30-b765-f29d23ab19cb?action=share&source=collection_link&creator=48220399"
     },
     "item": [
         {
@@ -192,7 +194,7 @@
                     "response": []
                 },
                 {
-                    "name": "Hard Delete",
+                    "name": "Force Delete",
                     "request": {
                         "method": "DELETE",
                         "header": [
@@ -208,13 +210,13 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{base_api}}/posts/hard-delete/50",
+                            "raw": "{{base_api}}/posts/force-delete/50",
                             "host": [
                                 "{{base_api}}"
                             ],
                             "path": [
                                 "posts",
-                                "hard-delete",
+                                "force-delete",
                                 "50"
                             ]
                         }
@@ -394,6 +396,11 @@
                                     "key": "comment",
                                     "value": "comment example",
                                     "type": "text"
+                                },
+                                {
+                                    "key": "post_id",
+                                    "value": "10",
+                                    "type": "text"
                                 }
                             ]
                         },
@@ -478,7 +485,7 @@
                     "response": []
                 },
                 {
-                    "name": "Hard Delete",
+                    "name": "Force Delete",
                     "request": {
                         "method": "DELETE",
                         "header": [
@@ -494,13 +501,13 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{base_api}}/comments/hard-delete/50",
+                            "raw": "{{base_api}}/comments/force-delete/50",
                             "host": [
                                 "{{base_api}}"
                             ],
                             "path": [
                                 "comments",
-                                "hard-delete",
+                                "force-delete",
                                 "50"
                             ]
                         }
@@ -735,7 +742,7 @@
                     "response": []
                 },
                 {
-                    "name": "Hard Delete",
+                    "name": "Force Delete",
                     "request": {
                         "method": "DELETE",
                         "header": [
@@ -751,13 +758,13 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{base_api}}/post-statuses/hard-delete/50",
+                            "raw": "{{base_api}}/post-statuses/force-delete/50",
                             "host": [
                                 "{{base_api}}"
                             ],
                             "path": [
                                 "post-statuses",
-                                "hard-delete",
+                                "force-delete",
                                 "50"
                             ]
                         }
@@ -992,7 +999,7 @@
                     "response": []
                 },
                 {
-                    "name": "Hard Delete",
+                    "name": "Force Delete",
                     "request": {
                         "method": "DELETE",
                         "header": [
@@ -1008,13 +1015,13 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{base_api}}/reactions/hard-delete/50",
+                            "raw": "{{base_api}}/reactions/force-delete/50",
                             "host": [
                                 "{{base_api}}"
                             ],
                             "path": [
                                 "reactions",
-                                "hard-delete",
+                                "force-delete",
                                 "50"
                             ]
                         }
@@ -1249,7 +1256,7 @@
                     "response": []
                 },
                 {
-                    "name": "Hard Delete",
+                    "name": "Force Delete",
                     "request": {
                         "method": "DELETE",
                         "header": [
@@ -1265,13 +1272,13 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{base_api}}/reaction-types/hard-delete/50",
+                            "raw": "{{base_api}}/reaction-types/force-delete/50",
                             "host": [
                                 "{{base_api}}"
                             ],
                             "path": [
                                 "reaction-types",
-                                "hard-delete",
+                                "force-delete",
                                 "50"
                             ]
                         }
@@ -1422,6 +1429,11 @@
                                     "key": "reply",
                                     "value": "reply example",
                                     "type": "text"
+                                },
+                                {
+                                    "key": "comment_id",
+                                    "value": "5",
+                                    "type": "text"
                                 }
                             ]
                         },
@@ -1506,7 +1518,7 @@
                     "response": []
                 },
                 {
-                    "name": "Hard Delete",
+                    "name": "Force Delete",
                     "request": {
                         "method": "DELETE",
                         "header": [
@@ -1522,13 +1534,13 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{base_api}}/replies/hard-delete/50",
+                            "raw": "{{base_api}}/replies/force-delete/50",
                             "host": [
                                 "{{base_api}}"
                             ],
                             "path": [
                                 "replies",
-                                "hard-delete",
+                                "force-delete",
                                 "50"
                             ]
                         }
@@ -1694,6 +1706,11 @@
                                     "key": "mobile",
                                     "value": "0123456879",
                                     "type": "number"
+                                },
+                                {
+                                    "key": "role",
+                                    "value": "user",
+                                    "type": "text"
                                 }
                             ]
                         },
@@ -1793,7 +1810,7 @@
                     "response": []
                 },
                 {
-                    "name": "Hard Delete",
+                    "name": "Force Delete",
                     "request": {
                         "method": "DELETE",
                         "header": [
@@ -1809,13 +1826,13 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{base_api}}/users/hard-delete/50",
+                            "raw": "{{base_api}}/users/force-delete/50",
                             "host": [
                                 "{{base_api}}"
                             ],
                             "path": [
                                 "users",
-                                "hard-delete",
+                                "force-delete",
                                 "50"
                             ]
                         }
@@ -1918,20 +1935,59 @@
         "bearer": [
             {
                 "key": "token",
-                "value": "{{api_token}}",
+                "value": "{{api_web_token}}",
                 "type": "string"
             }
         ]
     },
+    "event": [
+        {
+            "listen": "prerequest",
+            "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                    ""
+                ]
+            }
+        },
+        {
+            "listen": "test",
+            "script": {
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {},
+                "exec": [
+                    ""
+                ]
+            }
+        }
+    ],
     "variable": [
         {
             "key": "base_api",
             "value": "http://127.0.0.1:8000/api"
         },
         {
-            "key": "api_token",
-            "value": "2|PInxzqutuERhOeTl3ddRFEjXXna4yVqNcldxJNmzf24aa099",
-            "type": "default"
+            "key": "api_web_token",
+            "value": "3|6xVwXQwFpRhPe7rYbAdzllXOBKRNZcVmNDbawA3T29972824",
+            "description": "admin"
+        },
+        {
+            "key": "api_mobile_token",
+            "value": "4|sERmJ2fq8b6cebFtSmogy3cbEEL5nUisUhgGhgf81c0694de",
+            "description": "admin"
+        },
+        {
+            "key": "api_web_token",
+            "value": "5|U005E54WuLzCSOUk2DBNsFog5g6fYgaigQtHEobm6652b9bb",
+            "description": "user"
+        },
+        {
+            "key": "api_mobile_token",
+            "value": "",
+            "description": "user"
         }
     ]
 }

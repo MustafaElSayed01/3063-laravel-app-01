@@ -14,10 +14,10 @@ class PostController extends Controller
      */
     public function index()
     {
+        $this->authorize('viewAny', Post::class);
         $posts = Post::all();
-        $json_posts = PostResource::collection($posts);
 
-        return $json_posts;
+        return PostResource::collection($posts);
     }
 
     /**
@@ -33,6 +33,7 @@ class PostController extends Controller
      */
     public function store(StorePostRequest $request)
     {
+        $this->authorize('create', Post::class);
         $data = $request->validated();
         $data['user_id'] = $request->user()->id;
         $added = Post::create($data);
@@ -45,14 +46,10 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
-        $exists = Post::query()->where('id', $post->id)->exists();
-        if (! $exists) {
-            return 'Failure: Post not found';
-        }
-        $post = $post->load(['post_status', 'user', 'comments']);
-        $post_json = PostResource::make($post);
+        $this->authorize('view', $post);
+        $post->load(['post_status', 'user', 'comments', 'replies', 'reactions']);
 
-        return $post_json;
+        return PostResource::make($post);
     }
 
     /**
@@ -68,8 +65,9 @@ class PostController extends Controller
      */
     public function update(UpdatePostRequest $request, Post $post)
     {
-        $new_data = $request->validated();
-        $updated = $post->update($new_data);
+        $this->authorize('update', $post);
+        $data = $request->validated();
+        $updated = $post->update($data);
 
         return $updated ? 'Success' : 'Failure';
     }
@@ -79,24 +77,10 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
-        $exists = Post::query()->where('id', $post->id)->exists();
-        if (! $exists) {
-            return 'Failure: Post not found';
-        }
+        $this->authorize('delete', $post);
         $deleted = $post->delete();
 
         return $deleted ? 'Success' : 'Failure';
-    }
-
-    /**
-     * Randomly select n posts from the database.
-     */
-    public function random()
-    {
-        $posts = Post::query()->inRandomOrder()->take(5)->get();
-        $json_posts = PostResource::collection($posts);
-
-        return $json_posts;
     }
 
     /**
@@ -104,6 +88,7 @@ class PostController extends Controller
      */
     public function deleted()
     {
+        $this->authorize('viewAny', Post::class);
         $deleted_posts = Post::query()->onlyTrashed()->get();
         $json_posts = PostResource::collection($deleted_posts);
 
@@ -118,10 +103,7 @@ class PostController extends Controller
      */
     public function restore($id)
     {
-        $exists = Post::query()->onlyTrashed()->where('id', $id)->exists();
-        if (! $exists) {
-            return 'Failure: Post not deleted';
-        }
+        $this->authorize('restore', Post::class);
         $restored = Post::query()->onlyTrashed()->where('id', $id)->restore();
 
         return $restored ? 'Success' : 'Failure';
@@ -133,14 +115,11 @@ class PostController extends Controller
      * @param  int  $id  The id of the post to be permanently deleted.
      * @return string 'Success' if the post was successfully permanently deleted, 'Failure' otherwise.
      */
-    public function hard_delete($id)
+    public function force_delete($id)
     {
-        $exists = Post::query()->onlyTrashed()->where('id', $id)->exists();
-        if (! $exists) {
-            return 'Failure: Post not deleted';
-        }
-        $hard_deleted = Post::query()->onlyTrashed()->where('id', $id)->forceDelete();
+        $this->authorize('forceDelete', Post::class);
+        $force_deleted = Post::query()->onlyTrashed()->where('id', $id)->forceDelete();
 
-        return $hard_deleted ? 'Success' : 'Failure';
+        return $force_deleted ? 'Success' : 'Failure';
     }
 }

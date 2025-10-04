@@ -6,7 +6,6 @@ use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
-use Illuminate\Support\Facades\Gate;
 
 class UserController extends Controller
 {
@@ -15,19 +14,11 @@ class UserController extends Controller
      */
     public function index()
     {
-        Gate::authorize('viewAny', User::class);
+        $this->authorize('viewAny', User::class);
+
         $users = User::all();
-        $users = UserResource::collection($users);
 
-        return $users;
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        return UserResource::collection($users);
     }
 
     /**
@@ -35,10 +26,14 @@ class UserController extends Controller
      */
     public function store(StoreUserRequest $request)
     {
-        $data = $request->validated();
-        $added = User::create($data);
+        $this->authorize('create', User::class);
 
-        return $added ? 'Success' : 'Failure';
+        $data = $request->validated();
+        $user = User::create($data);
+
+        return $user
+            ? new UserResource($user)
+            : response()->json(['message' => 'Failure'], 400);
     }
 
     /**
@@ -46,22 +41,11 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        $exists = User::query()->where('id', $user->id)->exists();
-        if (! $exists) {
-            return 'Failure: User not found';
-        }
-        $user = User::with('posts', 'comments', 'replies')->find($user->id);
-        $user_json = UserResource::make($user);
+        $this->authorize('view', $user);
 
-        return $user_json;
-    }
+        $user->load(['posts', 'comments', 'replies']);
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(User $user)
-    {
-        //
+        return new UserResource($user);
     }
 
     /**
@@ -69,68 +53,71 @@ class UserController extends Controller
      */
     public function update(UpdateUserRequest $request, User $user)
     {
-        $new_data = $request->validated();
-        $updated = $user->update($new_data);
+        $this->authorize('update', $user);
 
-        return $updated ? 'Success' : 'Failure';
+        $data = $request->validated();
+        $updated = $user->update($data);
+
+        return $updated
+            ? new UserResource($user->fresh())
+            : response()->json(['message' => 'Failure'], 400);
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Soft delete the specified resource.
      */
     public function destroy(User $user)
     {
-        $exists = User::query()->where('id', $user->id)->exists();
-        if (! $exists) {
-            return 'Failure: User not found';
-        }
+        $this->authorize('delete', $user);
+
         $deleted = $user->delete();
 
-        return $deleted ? 'Success' : 'Failure';
+        return $deleted
+            ? response()->json(['message' => 'User soft deleted'])
+            : response()->json(['message' => 'Failure'], 400);
     }
 
     /**
-     * Return a list of soft-deleted comments.
+     * Return a list of soft-deleted users.
      */
     public function deleted()
     {
-        $deleted_users = User::query()->onlyTrashed()->get();
-        $json_users = UserResource::collection($deleted_users);
+        $this->authorize('viewAny', User::class);
 
-        return $json_users;
+        $deletedUsers = User::onlyTrashed()->get();
+
+        return UserResource::collection($deletedUsers);
     }
 
     /**
-     * Restore the specified soft-deleted user to its original state.
-     *
-     * @param  int  $id  The id of the user to be restored.
-     * @return string 'Success' if the user was successfully restored, 'Failure' otherwise.
+     * Restore the specified soft-deleted user.
      */
     public function restore($id)
     {
-        $exists = User::query()->onlyTrashed()->where('id', $id)->exists();
-        if (! $exists) {
-            return 'Failure: User not deleted';
-        }
-        $restored = User::query()->onlyTrashed()->where('id', $id)->restore();
+        $user = User::onlyTrashed()->findOrFail($id);
 
-        return $restored ? 'Success' : 'Failure';
+        $this->authorize('restore', $user);
+
+        $restored = $user->restore();
+
+        return $restored
+            ? response()->json(['message' => 'User restored'])
+            : response()->json(['message' => 'Failure'], 400);
     }
 
     /**
      * Permanently delete the specified user.
-     *
-     * @param  int  $id  The id of the user to be permanently deleted.
-     * @return string 'Success' if the user was successfully permanently deleted, 'Failure' otherwise.
      */
-    public function hard_delete($id)
+    public function force_delete($id)
     {
-        $exists = User::query()->onlyTrashed()->where('id', $id)->exists();
-        if (! $exists) {
-            return 'Failure: User not deleted';
-        }
-        $hard_deleted = User::query()->onlyTrashed()->where('id', $id)->forceDelete();
+        $user = User::onlyTrashed()->findOrFail($id);
 
-        return $hard_deleted ? 'Success' : 'Failure';
+        $this->authorize('forceDelete', $user);
+
+        $force_deleted = $user->forceDelete();
+
+        return $force_deleted
+            ? response()->json(['message' => 'User permanently deleted'])
+            : response()->json(['message' => 'Failure'], 400);
     }
 }

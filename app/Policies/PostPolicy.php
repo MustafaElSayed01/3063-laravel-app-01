@@ -12,7 +12,7 @@ class PostPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return $user->hasAbility('posts:viewAny', ['admin', 'manager', 'user']);
     }
 
     /**
@@ -20,7 +20,8 @@ class PostPolicy
      */
     public function view(User $user, Post $post): bool
     {
-        return false;
+        return $user->hasAbility('posts:view', ['admin', 'manager'])
+            || ($user->hasAbility('posts:view', ['user']) && $user->id === $post->user_id);
     }
 
     /**
@@ -28,7 +29,7 @@ class PostPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return $user->hasAbility('posts:create', ['admin', 'manager', 'user']);
     }
 
     /**
@@ -36,7 +37,8 @@ class PostPolicy
      */
     public function update(User $user, Post $post): bool
     {
-        return false;
+        return $user->hasAbility('posts:update', ['admin', 'manager'])
+            || ($user->hasAbility('posts:update', ['user']) && $user->id === $post->user_id);
     }
 
     /**
@@ -44,7 +46,8 @@ class PostPolicy
      */
     public function delete(User $user, Post $post): bool
     {
-        return false;
+        return $user->hasAbility('posts:delete', ['admin', 'manager'])
+            || ($user->hasAbility('posts:delete', ['user']) && $user->id === $post->user_id);
     }
 
     /**
@@ -52,7 +55,7 @@ class PostPolicy
      */
     public function restore(User $user, Post $post): bool
     {
-        return false;
+        return $user->hasAbility('posts:restore', ['admin']);
     }
 
     /**
@@ -60,6 +63,6 @@ class PostPolicy
      */
     public function forceDelete(User $user, Post $post): bool
     {
-        return false;
+        return $user->hasAbility('posts:forceDelete', ['admin']);
     }
 }

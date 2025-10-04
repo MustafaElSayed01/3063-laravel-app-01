@@ -124,7 +124,7 @@ class PostStatusController extends Controller
      * @param  int  $id  The id of the Post Status to be permanently deleted.
      * @return string 'Success' if the Post Status was successfully permanently deleted, 'Failure' otherwise.
      */
-    public function hard_delete($id)
+    public function force_delete($id)
     {
         $exists = PostStatus::query()->onlyTrashed()->where('id', $id)->exists();
         if (! $exists) {
@@ -133,8 +133,8 @@ class PostStatusController extends Controller
         if (Post::query()->where('post_status_id', $id)->exists()) {
             return 'Failure: Cannot delete status with assigned posts';
         }
-        $hard_deleted = PostStatus::query()->onlyTrashed()->where('id', $id)->forceDelete();
+        $force_deleted = PostStatus::query()->onlyTrashed()->where('id', $id)->forceDelete();
 
-        return $hard_deleted ? 'Success' : 'Failure';
+        return $force_deleted ? 'Success' : 'Failure';
     }
 }

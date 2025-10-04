@@ -14,10 +14,10 @@ class ReplyController extends Controller
      */
     public function index()
     {
+        $this->authorize('viewAny', Reply::class);
         $replies = Reply::all();
-        $replies = ReplyResource::collection($replies);
 
-        return $replies;
+        return ReplyResource::collection($replies);
     }
 
     /**
@@ -33,6 +33,7 @@ class ReplyController extends Controller
      */
     public function store(StoreReplyRequest $request)
     {
+        $this->authorize('create', Reply::class);
         $data = $request->validated();
         $data['user_id'] = $request->user()->id;
         $added = Reply::create($data);
@@ -45,14 +46,10 @@ class ReplyController extends Controller
      */
     public function show(Reply $reply)
     {
-        $exists = Reply::query()->where('id', $reply->id)->exists();
-        if (! $exists) {
-            return 'Failure: Reply not found';
-        }
-        $reply = Reply::with('user')->find($reply->id);
-        $reply_json = ReplyResource::make($reply);
+        $this->authorize('view', $reply);
+        $reply = Reply::load(['post', 'comment', 'user']);
 
-        return $reply_json;
+        return ReplyResource::make($reply);
     }
 
     /**
@@ -68,6 +65,7 @@ class ReplyController extends Controller
      */
     public function update(UpdateReplyRequest $request, Reply $reply)
     {
+        $this->authorize('update', $reply);
         $new_data = $request->validated();
         $updated = $reply->update($new_data);
 
@@ -79,10 +77,7 @@ class ReplyController extends Controller
      */
     public function destroy(Reply $reply)
     {
-        $exists = Reply::query()->where('id', $reply->id)->exists();
-        if (! $exists) {
-            return 'Failure: Reply not found';
-        }
+        $this->authorize('delete', $reply);
         $deleted = $reply->delete();
 
         return $deleted ? 'Success' : 'Failure';
@@ -93,6 +88,7 @@ class ReplyController extends Controller
      */
     public function deleted()
     {
+        $this->authorize('viewAny', Reply::class);
         $deleted_replies = Reply::query()->onlyTrashed()->get();
         $json_replies = ReplyResource::collection($deleted_replies);
 
@@ -107,10 +103,7 @@ class ReplyController extends Controller
      */
     public function restore($id)
     {
-        $exists = Reply::query()->onlyTrashed()->where('id', $id)->exists();
-        if (! $exists) {
-            return 'Failure: Reply not deleted';
-        }
+        $this->authorize('restore', Reply::class);
         $restored = Reply::query()->onlyTrashed()->where('id', $id)->restore();
 
         return $restored ? 'Success' : 'Failure';
@@ -122,14 +115,11 @@ class ReplyController extends Controller
      * @param  int  $id  The id of the reply to be permanently deleted.
      * @return string 'Success' if the reply was successfully permanently deleted, 'Failure' otherwise.
      */
-    public function hard_delete($id)
+    public function force_delete($id)
     {
-        $exists = Reply::query()->onlyTrashed()->where('id', $id)->exists();
-        if (! $exists) {
-            return 'Failure: Reply not deleted';
-        }
-        $hard_deleted = Reply::query()->onlyTrashed()->where('id', $id)->forceDelete();
+        $this->authorize('forceDelete', Reply::class);
+        $force_deleted = Reply::query()->onlyTrashed()->where('id', $id)->forceDelete();
 
-        return $hard_deleted ? 'Success' : 'Failure';
+        return $force_deleted ? 'Success' : 'Failure';
     }
 }

@@ -12,7 +12,7 @@ class ReplyPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return $user->hasAbility('replies:viewAny', ['admin', 'manager', 'user']);
     }
 
     /**
@@ -20,7 +20,9 @@ class ReplyPolicy
      */
     public function view(User $user, Reply $reply): bool
     {
-        return false;
+        return $user->hasAbility('replies:view', ['admin', 'manager'])
+            || ($user->hasAbility('replies:view', ['user']) && $user->id === $reply->user_id);
+
     }
 
     /**
@@ -28,7 +30,7 @@ class ReplyPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return $user->hasAbility('replies:create', ['admin', 'manager', 'user']);
     }
 
     /**
@@ -36,7 +38,8 @@ class ReplyPolicy
      */
     public function update(User $user, Reply $reply): bool
     {
-        return false;
+        return $user->hasAbility('replies:update', ['admin', 'manager'])
+            || ($user->hasAbility('replies:update', ['user']) && $user->id === $reply->user_id);
     }
 
     /**
@@ -44,7 +47,8 @@ class ReplyPolicy
      */
     public function delete(User $user, Reply $reply): bool
     {
-        return false;
+        return $user->hasAbility('replies:delete', ['admin', 'manager'])
+            || ($user->hasAbility('replies:delete', ['user']) && $user->id === $reply->user_id);
     }
 
     /**
@@ -52,7 +56,7 @@ class ReplyPolicy
      */
     public function restore(User $user, Reply $reply): bool
     {
-        return false;
+        return $user->hasAbility('replies:restore', ['admin']);
     }
 
     /**
@@ -60,6 +64,6 @@ class ReplyPolicy
      */
     public function forceDelete(User $user, Reply $reply): bool
     {
-        return false;
+        return $user->hasAbility('replies:forceDelete', ['admin']);
     }
 }

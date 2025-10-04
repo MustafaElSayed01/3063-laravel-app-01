@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\AbilityGenerator;
 use App\Http\Requests\LoginRequest;
-use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -23,7 +23,8 @@ class AuthController extends Controller
         $auth = Auth::attempt($data);
         if ($auth) {
             $user = Auth::user();
-            $token = $user->createToken('web');
+            $abilities = AbilityGenerator::generate($user->role, 'web');
+            $token = $user->createToken('web', $abilities);
             $user['token'] = $token->plainTextToken;
 
             return response()->json($user, 200);
@@ -45,7 +46,10 @@ class AuthController extends Controller
         $auth = Auth::attempt($data);
         if ($auth) {
             $user = Auth::user();
-            $token = $user->createToken('mobile');
+
+            $abilities = AbilityGenerator::generate($user->role, 'mobile');
+
+            $token = $user->createToken('mobile', $abilities);
             $user['token'] = $token->plainTextToken;
 
             return response()->json($user, 200);

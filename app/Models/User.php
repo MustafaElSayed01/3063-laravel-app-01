@@ -51,23 +51,47 @@ class User extends Authenticatable
     }
 
     // Relationships
+
+    /**
+     * Get all of the user's posts.
+     */
     public function posts(): HasMany
     {
         return $this->hasMany(Post::class);
     }
 
+    /**
+     * Get all of the comments for the user.
+     */
     public function comments(): HasMany
     {
         return $this->hasMany(Comment::class);
     }
 
+    /**
+     * Get all of the replies for the user.
+     */
     public function replies(): HasMany
     {
         return $this->hasMany(Reply::class);
     }
 
+    /**
+     * Get all of the user's reactions.
+     */
     public function reactions(): HasMany
     {
         return $this->hasMany(Reaction::class);
+    }
+
+    /**
+     * Check if the user has the given ability.
+     * If $roles is not empty, the user must have one of the given roles.
+     */
+    public function hasAbility(string $ability, array $roles = []): bool
+    {
+        $roleOk = empty($roles) || in_array($this->role, $roles, true);
+
+        return $roleOk && $this->tokenCan($ability);
     }
 }

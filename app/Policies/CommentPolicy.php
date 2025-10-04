@@ -3,31 +3,17 @@
 namespace App\Policies;
 
 use App\Models\Comment;
-use App\Models\Post;
 use App\Models\User;
 
 class CommentPolicy
 {
-    private function hasAccess(User $user, Comment $comment)
-    {
-        // Check if the user is the owner of the comment
-        $isOwner = $user->id === $comment->user_id;
-
-        // Check if the user is the owner of the post that has the comment
-        $post = Post::where('id', $comment->post_id)->first();
-
-        // Check if the user is the owner of the post
-        $isPostOwner = $user->id === $post->user_id;
-
-        return $isOwner || $isPostOwner;
-    }
-
     /**
      * Determine whether the user can view any models.
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return $user->hasAbility('comments:viewAny', ['admin', 'manager', 'user']);
+
     }
 
     /**
@@ -35,7 +21,8 @@ class CommentPolicy
      */
     public function view(User $user, Comment $comment): bool
     {
-        return self::hasAccess($user, $comment);
+        return $user->hasAbility('comments:view', ['admin', 'manager'])
+            || ($user->hasAbility('comments:view', ['user']) && $user->id === $comment->user_id);
     }
 
     /**
@@ -43,7 +30,7 @@ class CommentPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return $user->hasAbility('comments:create', ['admin', 'manager', 'user']);
     }
 
     /**
@@ -51,7 +38,8 @@ class CommentPolicy
      */
     public function update(User $user, Comment $comment): bool
     {
-        return self::hasAccess($user, $comment);
+        return $user->hasAbility('comments:update', ['admin', 'manager'])
+            || ($user->hasAbility('comments:update', ['user']) && $user->id === $comment->user_id);
     }
 
     /**
@@ -59,7 +47,8 @@ class CommentPolicy
      */
     public function delete(User $user, Comment $comment): bool
     {
-        return self::hasAccess($user, $comment);
+        return $user->hasAbility('comments:delete', ['admin', 'manager'])
+                || ($user->hasAbility('comments:delete', ['user']) && $user->id === $comment->user_id);
     }
 
     /**
@@ -67,7 +56,7 @@ class CommentPolicy
      */
     public function restore(User $user, Comment $comment): bool
     {
-        return self::hasAccess($user, $comment);
+        return $user->hasAbility('comments:restore', ['admin']);
     }
 
     /**
@@ -75,6 +64,6 @@ class CommentPolicy
      */
     public function forceDelete(User $user, Comment $comment): bool
     {
-        return self::hasAccess($user, $comment);
+        return $user->hasAbility('comments:forceDelete', ['admin']);
     }
 }

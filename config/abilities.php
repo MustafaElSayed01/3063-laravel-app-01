@@ -54,9 +54,13 @@ return [
         ],
 
         'reactions' => [
+            'viewAny',
+            'view',
             'create',
+            'update',
             'delete',
-
+            'restore',
+            'forceDelete',
         ],
 
         'post-statuses' => [

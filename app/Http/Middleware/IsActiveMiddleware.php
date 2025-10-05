@@ -6,22 +6,18 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class HasRolesMiddleware
+class IsActiveMiddleware
 {
     /**
      * Handle an incoming request.
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next, String $roles): Response
+    public function handle(Request $request, Closure $next): Response
     {
-        $routeRoles = explode(',', $roles);
-        $userRoles = $request->user()->currentAccessToken()->abilities;
-
-        if (!count(array_intersect($routeRoles, $userRoles))) {
+        if (!$request->user()->is_active) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
-
         return $next($request);
     }
 }

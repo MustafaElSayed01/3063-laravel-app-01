@@ -25,9 +25,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // Posts
     Route::prefix('posts')->controller(PostController::class)->group(function () {
-        Route::get('deleted', 'deleted');
+        Route::get('deleted', 'deleted')->middleware('hasRoles:admin');
         Route::get('restore/{id}', 'restore');
-        Route::delete('force-delete/{id}', 'force_delete');
+        Route::delete('force-delete/{id}', 'force_delete')->middleware('hasRoles:admin', 'isActive');
     });
 
     // Comments

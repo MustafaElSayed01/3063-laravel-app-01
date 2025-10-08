@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Helpers\AbilityGenerator;
 use App\Http\Requests\LoginRequest;
+use App\Mail\LoggedInMail;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class AuthController extends Controller
 {
@@ -26,7 +28,8 @@ class AuthController extends Controller
             $abilities = AbilityGenerator::generate($user->role, 'web');
             $token = $user->createToken('web', $abilities);
             $user['token'] = $token->plainTextToken;
-
+            // Send email to user
+            Mail::to($user['email'])->send(new LoggedInMail($user));
             return response()->json($user, 200);
         }
 

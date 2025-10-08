@@ -16,8 +16,10 @@ class CommentController extends Controller
     {
         $this->authorize('viewAny', arguments: Comment::class);
         $comments = Comment::all();
+        $json_comments = CommentResource::collection($comments);
 
-        return CommentResource::collection($comments);
+        return $this->success($json_comments);
+
     }
 
     /**
@@ -38,7 +40,7 @@ class CommentController extends Controller
         $data['user_id'] = $request->user()->id;
         $added = Comment::create($data);
 
-        return $added ? 'Success' : 'Failure';
+        return $added ? $this->success() : $this->fail();
     }
 
     /**
@@ -47,10 +49,10 @@ class CommentController extends Controller
     public function show(Comment $comment)
     {
         $this->authorize('view', $comment);
-
         $comment->load(['post', 'user', 'replies', 'reactions']);
+        $comment_json = CommentResource::make($comment);
 
-        return CommentResource::make($comment);
+        return $this->success($comment_json);
     }
 
     /**
@@ -70,7 +72,7 @@ class CommentController extends Controller
         $new_data = $request->validated();
         $updated = $comment->update($new_data);
 
-        return $updated ? 'Success' : 'Failure';
+        return $updated ? $this->success() : $this->fail();
     }
 
     /**
@@ -79,10 +81,9 @@ class CommentController extends Controller
     public function destroy(Comment $comment)
     {
         $this->authorize('delete', $comment);
-
         $deleted = $comment->delete();
 
-        return $deleted ? 'Success' : 'Failure';
+        return $deleted ? $this->success() : $this->fail();
     }
 
     /**
@@ -94,7 +95,7 @@ class CommentController extends Controller
         $deleted_comments = Comment::query()->onlyTrashed()->get();
         $json_comments = CommentResource::collection($deleted_comments);
 
-        return $json_comments;
+        return $this->success($json_comments);
     }
 
     /**
@@ -106,10 +107,9 @@ class CommentController extends Controller
     public function restore($id)
     {
         $this->authorize('restore', Comment::class);
-
         $restored = Comment::query()->onlyTrashed()->where('id', $id)->restore();
 
-        return $restored ? 'Success' : 'Failure';
+        return $restored ? $this->success() : $this->fail();
     }
 
     /**
@@ -121,9 +121,8 @@ class CommentController extends Controller
     public function force_delete($id)
     {
         $this->authorize('forceDelete', Comment::class);
-
         $force_deleted = Comment::query()->onlyTrashed()->where('id', $id)->forceDelete();
 
-        return $force_deleted ? 'Success' : 'Failure';
+        return $force_deleted ? $this->success() : $this->fail();
     }
 }

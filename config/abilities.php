@@ -90,7 +90,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | Define which resources each role can interact with.
-    | Use '*' to give full access (super admin).
+    | Use '*' to give full access.
     |
     */
     'roles' => [

@@ -15,10 +15,10 @@ class UserController extends Controller
     public function index()
     {
         $this->authorize('viewAny', User::class);
-
         $users = User::all();
+        $json_users = UserResource::collection($users);
 
-        return UserResource::collection($users);
+        return $this->success($json_users);
     }
 
     /**
@@ -27,13 +27,10 @@ class UserController extends Controller
     public function store(StoreUserRequest $request)
     {
         $this->authorize('create', User::class);
-
         $data = $request->validated();
-        $user = User::create($data);
+        $added = User::create($data);
 
-        return $user
-            ? new UserResource($user)
-            : response()->json(['message' => 'Failure'], 400);
+        return $added ? $this->success() : $this->fail();
     }
 
     /**
@@ -42,10 +39,11 @@ class UserController extends Controller
     public function show(User $user)
     {
         $this->authorize('view', $user);
-
         $user->load(['posts', 'comments', 'replies']);
+        $user_json = UserResource::make($user);
 
-        return new UserResource($user);
+        return $this->success($user_json);
+
     }
 
     /**
@@ -54,13 +52,10 @@ class UserController extends Controller
     public function update(UpdateUserRequest $request, User $user)
     {
         $this->authorize('update', $user);
-
         $data = $request->validated();
         $updated = $user->update($data);
 
-        return $updated
-            ? new UserResource($user->fresh())
-            : response()->json(['message' => 'Failure'], 400);
+        return $updated ? $this->success() : $this->fail();
     }
 
     /**
@@ -69,12 +64,9 @@ class UserController extends Controller
     public function destroy(User $user)
     {
         $this->authorize('delete', $user);
-
         $deleted = $user->delete();
 
-        return $deleted
-            ? response()->json(['message' => 'User soft deleted'])
-            : response()->json(['message' => 'Failure'], 400);
+        return $deleted ? $this->success() : $this->fail();
     }
 
     /**
@@ -83,10 +75,10 @@ class UserController extends Controller
     public function deleted()
     {
         $this->authorize('viewAny', User::class);
-
         $deletedUsers = User::onlyTrashed()->get();
+        $json_data = UserResource::collection($deletedUsers);
 
-        return UserResource::collection($deletedUsers);
+        return $this->success($json_data);
     }
 
     /**
@@ -100,9 +92,7 @@ class UserController extends Controller
 
         $restored = $user->restore();
 
-        return $restored
-            ? response()->json(['message' => 'User restored'])
-            : response()->json(['message' => 'Failure'], 400);
+        return $restored ? $this->success() : $this->fail();
     }
 
     /**
@@ -116,8 +106,6 @@ class UserController extends Controller
 
         $force_deleted = $user->forceDelete();
 
-        return $force_deleted
-            ? response()->json(['message' => 'User permanently deleted'])
-            : response()->json(['message' => 'Failure'], 400);
+        return $force_deleted ? $this->success() : $this->fail();
     }
 }

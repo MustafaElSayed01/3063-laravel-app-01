@@ -7,7 +7,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class IsActiveMiddleware
+class verifiedEmailMiddleware
 {
     use JsonResponseTrait;
 
@@ -18,7 +18,8 @@ class IsActiveMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (! $request->user()->is_active) {
+        $user = $request->user();
+        if ($user && ! $user->hasVerifiedEmail()) {
             return $this->fail(401);
         }
 

@@ -15,10 +15,11 @@ class PostStatusController extends Controller
      */
     public function index()
     {
+        $this->authorize('viewAny', PostStatus::class);
         $post_statuses = PostStatus::all();
         $json_post_statuses = PostStatusResource::collection($post_statuses);
 
-        return $json_post_statuses;
+        return $this->success($json_post_statuses);
     }
 
     /**
@@ -34,10 +35,11 @@ class PostStatusController extends Controller
      */
     public function store(StorePostStatusRequest $request)
     {
+        $this->authorize('create', Post::class);
         $data = $request->validated();
         $added = PostStatus::create($data);
 
-        return $added ? 'Success' : 'Failure';
+        return $added ? $this->success() : $this->fail();
     }
 
     /**
@@ -45,13 +47,10 @@ class PostStatusController extends Controller
      */
     public function show(PostStatus $postStatus)
     {
-        $exists = PostStatus::query()->where('id', $postStatus->id)->exists();
-        if (! $exists) {
-            return 'Failure: Post not found';
-        }
+        $this->authorize('view', $postStatus);
         $post_status_json = PostStatusResource::make($postStatus);
 
-        return $post_status_json;
+        return $this->success($post_status_json);
     }
 
     /**
@@ -67,10 +66,11 @@ class PostStatusController extends Controller
      */
     public function update(UpdatePostStatusRequest $request, PostStatus $postStatus)
     {
+        $this->authorize('update', $postStatus);
         $new_data = $request->validated();
         $updated = $postStatus->update($new_data);
 
-        return $updated ? 'Success' : 'Failure';
+        return $updated ? $this->success() : $this->fail();
     }
 
     /**
@@ -78,16 +78,14 @@ class PostStatusController extends Controller
      */
     public function destroy(PostStatus $postStatus)
     {
-        $exists = PostStatus::query()->where('id', $postStatus->id)->exists();
-        if (! $exists) {
-            return 'Failure: Post Status not found';
-        }
-        if (Post::query()->where('post_status_id', $postStatus->id)->exists()) {
-            return 'Failure: Cannot delete status with assigned posts';
+        $this->authorize('delete', $postStatus);
+        $post = Post::query()->where('post_status_id', $postStatus->id)->exists();
+        if ($post) {
+            return $this->fail();
         }
         $deleted = $postStatus->delete();
 
-        return $deleted ? 'Success' : 'Failure';
+        return $deleted ? $this->success() : $this->fail();
     }
 
     /**
@@ -95,10 +93,11 @@ class PostStatusController extends Controller
      */
     public function deleted()
     {
-        $deleted_posts = PostStatus::query()->onlyTrashed()->get();
-        $json_posts = PostStatusResource::collection($deleted_posts);
+        $this->authorize('viewAny', PostStatus::class);
+        $deleted_post_statuses = PostStatus::query()->onlyTrashed()->get();
+        $json_post_statuses = PostStatusResource::collection($deleted_post_statuses);
 
-        return $json_posts;
+        return $this->success($json_post_statuses);
     }
 
     /**
@@ -109,13 +108,10 @@ class PostStatusController extends Controller
      */
     public function restore($id)
     {
-        $exists = PostStatus::query()->onlyTrashed()->where('id', $id)->exists();
-        if (! $exists) {
-            return 'Failure: Post Status not deleted';
-        }
+        $this->authorize('restore', Post::class);
         $restored = PostStatus::query()->onlyTrashed()->where('id', $id)->restore();
 
-        return $restored ? 'Success' : 'Failure';
+        return $restored ? $this->success() : $this->fail();
     }
 
     /**
@@ -126,15 +122,13 @@ class PostStatusController extends Controller
      */
     public function force_delete($id)
     {
-        $exists = PostStatus::query()->onlyTrashed()->where('id', $id)->exists();
-        if (! $exists) {
-            return 'Failure: Post Status not deleted';
-        }
+        $this->authorize('forceDelete', PostStatus::class);
+        $this->authorize('forceDelete', Post::class);
         if (Post::query()->where('post_status_id', $id)->exists()) {
-            return 'Failure: Cannot delete status with assigned posts';
+            return $this->fail();
         }
         $force_deleted = PostStatus::query()->onlyTrashed()->where('id', $id)->forceDelete();
 
-        return $force_deleted ? 'Success' : 'Failure';
+        return $force_deleted ? $this->success() : $this->fail();
     }
 }

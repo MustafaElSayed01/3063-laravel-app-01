@@ -7,7 +7,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class IsActiveMiddleware
+class tokenTypeMiddleware
 {
     use JsonResponseTrait;
 
@@ -16,9 +16,11 @@ class IsActiveMiddleware
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next): Response
+    public function handle(Request $request, Closure $next, $type): Response
     {
-        if (! $request->user()->is_active) {
+        $token = $request->user()?->currentAccessToken();
+
+        if (! $token || $token->name !== $type) {
             return $this->fail(401);
         }
 

@@ -12,7 +12,7 @@ class ReactionTypePolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return $user->hasAbility('reaction_types:viewAny', ['admin', 'manager', 'user']);
     }
 
     /**
@@ -20,7 +20,8 @@ class ReactionTypePolicy
      */
     public function view(User $user, ReactionType $reactionType): bool
     {
-        return false;
+        return $user->hasAbility('reaction_types:view', ['admin', 'manager'])
+            || ($user->hasAbility('reaction_types:view', ['user']) && $user->id === $reactionType->user_id);
     }
 
     /**
@@ -28,7 +29,7 @@ class ReactionTypePolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return $user->hasAbility('reaction_types:create', ['admin', 'manager', 'user']);
     }
 
     /**
@@ -36,7 +37,8 @@ class ReactionTypePolicy
      */
     public function update(User $user, ReactionType $reactionType): bool
     {
-        return false;
+        return $user->hasAbility('reaction_types:update', ['admin', 'manager'])
+            || ($user->hasAbility('reaction_types:update', ['user']) && $user->id === $reactionType->user_id);
     }
 
     /**
@@ -44,7 +46,8 @@ class ReactionTypePolicy
      */
     public function delete(User $user, ReactionType $reactionType): bool
     {
-        return false;
+        return $user->hasAbility('reaction_types:delete', ['admin', 'manager'])
+            || ($user->hasAbility('reaction_types:delete', ['user']) && $user->id === $reactionType->user_id);
     }
 
     /**
@@ -52,7 +55,7 @@ class ReactionTypePolicy
      */
     public function restore(User $user, ReactionType $reactionType): bool
     {
-        return false;
+        return $user->hasAbility('reaction_types:restore', ['admin']);
     }
 
     /**
@@ -60,6 +63,6 @@ class ReactionTypePolicy
      */
     public function forceDelete(User $user, ReactionType $reactionType): bool
     {
-        return false;
+        return $user->hasAbility('reaction_types:forceDelete', ['admin']);
     }
 }

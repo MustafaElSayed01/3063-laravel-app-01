@@ -14,10 +14,11 @@ class ReactionController extends Controller
      */
     public function index()
     {
+        $this->authorize('viewAny', Reaction::class);
         $reaction = Reaction::all();
         $json_reaction = ReactionResource::collection($reaction);
 
-        return $json_reaction;
+        return $this->success($json_reaction);
     }
 
     /**
@@ -33,7 +34,11 @@ class ReactionController extends Controller
      */
     public function store(StoreReactionRequest $request)
     {
+        $this->authorize('create', Reaction::class);
         $data = $request->validated();
+        $added = Reaction::create($data);
+
+        return $added ? $this->success() : $this->fail();
     }
 
     /**

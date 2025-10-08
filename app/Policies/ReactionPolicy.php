@@ -12,7 +12,7 @@ class ReactionPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return $user->hasAbility('reactions:viewAny', ['admin', 'manager', 'user']);
     }
 
     /**
@@ -20,7 +20,8 @@ class ReactionPolicy
      */
     public function view(User $user, Reaction $reaction): bool
     {
-        return false;
+        return $user->hasAbility('reactions:view', ['admin', 'manager'])
+            || ($user->hasAbility('reactions:view', ['user']) && $user->id === $reaction->user_id);
     }
 
     /**
@@ -28,7 +29,7 @@ class ReactionPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return $user->hasAbility('reactions:create', ['admin', 'manager', 'user']);
     }
 
     /**
@@ -36,7 +37,8 @@ class ReactionPolicy
      */
     public function update(User $user, Reaction $reaction): bool
     {
-        return false;
+        return $user->hasAbility('reactions:update', ['admin', 'manager'])
+            || ($user->hasAbility('reactions:update', ['user']) && $user->id === $reaction->user_id);
     }
 
     /**
@@ -44,7 +46,8 @@ class ReactionPolicy
      */
     public function delete(User $user, Reaction $reaction): bool
     {
-        return false;
+        return $user->hasAbility('reactions:delete', ['admin', 'manager'])
+            || ($user->hasAbility('reactions:delete', ['user']) && $user->id === $reaction->user_id);
     }
 
     /**
@@ -52,7 +55,7 @@ class ReactionPolicy
      */
     public function restore(User $user, Reaction $reaction): bool
     {
-        return false;
+        return $user->hasAbility('reactions:restore', ['admin']);
     }
 
     /**
@@ -60,6 +63,6 @@ class ReactionPolicy
      */
     public function forceDelete(User $user, Reaction $reaction): bool
     {
-        return false;
+        return $user->hasAbility('reactions:forceDelete', ['admin']);
     }
 }

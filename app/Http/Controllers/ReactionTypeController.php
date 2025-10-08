@@ -14,10 +14,11 @@ class ReactionTypeController extends Controller
      */
     public function index()
     {
+        $this->authorize('viewAny', ReactionType::class);
         $reactionTypes = ReactionType::all();
         $json_reactionTypes = ReactionTypeResource::collection($reactionTypes);
 
-        return $json_reactionTypes;
+        return $this->success($json_reactionTypes);
     }
 
     /**
@@ -33,10 +34,11 @@ class ReactionTypeController extends Controller
      */
     public function store(StoreReactionTypeRequest $request)
     {
+        $this->authorize('create', ReactionType::class);
         $data = $request->validated();
         $added = ReactionType::create($data);
 
-        return $added ? 'Success' : 'Failure';
+        return $added ? $this->success() : $this->fail();
     }
 
     /**
@@ -44,14 +46,12 @@ class ReactionTypeController extends Controller
      */
     public function show(ReactionType $reactionType)
     {
-        $exists = ReactionType::query()->where('id', $reactionType->id)->exists();
-        if (! $exists) {
-            return 'Failure: Reaction Type not found';
-        }
+        $this->authorize('view', $reactionType);
+
         $reactionType = ReactionType::with('reactions')->find($reactionType->id);
         $reactionType_json = ReactionTypeResource::make($reactionType);
 
-        return $reactionType_json;
+        return $this->success($reactionType_json);
     }
 
     /**
@@ -67,10 +67,11 @@ class ReactionTypeController extends Controller
      */
     public function update(UpdateReactionTypeRequest $request, ReactionType $reactionType)
     {
+        $this->authorize('update', $reactionType);
         $new_data = $request->validated();
         $updated = $reactionType->update($new_data);
 
-        return $updated ? 'Success' : 'Failure';
+        return $updated ? $this->success() : $this->fail();
     }
 
     /**
@@ -78,13 +79,10 @@ class ReactionTypeController extends Controller
      */
     public function destroy(ReactionType $reactionType)
     {
-        $exists = ReactionType::query()->where('id', $reactionType->id)->exists();
-        if (! $exists) {
-            return 'Failure: reaction type not found';
-        }
+        $this->authorize('delete', $reactionType);
         $deleted = $reactionType->delete();
 
-        return $deleted ? 'Success' : 'Failure';
+        return $deleted ? $this->success() : $this->fail();
     }
 
     /**
@@ -92,10 +90,11 @@ class ReactionTypeController extends Controller
      */
     public function deleted()
     {
+        $this->authorize('viewAny', ReactionType::class);
         $deleted_reaction_types = ReactionType::query()->onlyTrashed()->get();
         $json_reaction_types = ReactionTypeResource::collection($deleted_reaction_types);
 
-        return $json_reaction_types;
+        return $this->success($json_reaction_types);
     }
 
     /**
@@ -106,13 +105,10 @@ class ReactionTypeController extends Controller
      */
     public function restore($id)
     {
-        $exists = ReactionType::query()->onlyTrashed()->where('id', $id)->exists();
-        if (! $exists) {
-            return 'Failure: Reaction Type not deleted';
-        }
+        $this->authorize('restore', ReactionType::class);
         $restored = ReactionType::query()->onlyTrashed()->where('id', $id)->restore();
 
-        return $restored ? 'Success' : 'Failure';
+        return $restored ? $this->success() : $this->fail();
     }
 
     /**
@@ -123,12 +119,9 @@ class ReactionTypeController extends Controller
      */
     public function force_delete($id)
     {
-        $exists = ReactionType::query()->onlyTrashed()->where('id', $id)->exists();
-        if (! $exists) {
-            return 'Failure: ReactionType not deleted';
-        }
+        $this->authorize('forceDelete', ReactionType::class);
         $force_deleted = ReactionType::query()->onlyTrashed()->where('id', $id)->forceDelete();
 
-        return $force_deleted ? 'Success' : 'Failure';
+        return $force_deleted ? $this->success() : $this->fail();
     }
 }

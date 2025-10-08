@@ -17,7 +17,7 @@ trait JsonResponseTrait
         201 => 'Created',
         202 => 'Accepted',
         204 => 'No Content',
-        
+
         // 4xx Responses
         400 => 'Bad Request',
         401 => 'Unauthorized',
@@ -40,7 +40,7 @@ trait JsonResponseTrait
         429 => 'Too Many Requests',
         431 => 'Request Header Fields Too Large',
         451 => 'Unavailable For Legal Reasons',
-        
+
         // 5xx Responses
         500 => 'Internal Server Error',
         501 => 'Not Implemented',
@@ -50,7 +50,8 @@ trait JsonResponseTrait
         505 => 'HTTP Version Not Supported',
         511 => 'Network Authentication Required',
     ];
-    public function success($data, $statusCode = 200): JsonResponse
+
+    public function success($data = null, int $statusCode = 200): JsonResponse
     {
         return response()->json([
             'success' => true,

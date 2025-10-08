@@ -16,8 +16,9 @@ class PostController extends Controller
     {
         $this->authorize('viewAny', Post::class);
         $posts = Post::all();
+        $json_posts = PostResource::collection($posts);
 
-        return PostResource::collection($posts);
+        return $this->success($json_posts);
     }
 
     /**
@@ -38,7 +39,7 @@ class PostController extends Controller
         $data['user_id'] = $request->user()->id;
         $added = Post::create($data);
 
-        return $added ? 'Success' : 'Failure';
+        return $added ? $this->success() : $this->fail();
     }
 
     /**
@@ -48,8 +49,10 @@ class PostController extends Controller
     {
         $this->authorize('view', $post);
         $post->load(['post_status', 'user', 'comments', 'replies', 'reactions']);
+        $post_json = PostResource::make($post);
 
-        return PostResource::make($post);
+        return $this->success($post_json);
+
     }
 
     /**
@@ -69,7 +72,7 @@ class PostController extends Controller
         $data = $request->validated();
         $updated = $post->update($data);
 
-        return $updated ? 'Success' : 'Failure';
+        return $updated ? $this->success() : $this->fail();
     }
 
     /**
@@ -80,7 +83,7 @@ class PostController extends Controller
         $this->authorize('delete', $post);
         $deleted = $post->delete();
 
-        return $deleted ? 'Success' : 'Failure';
+        return $deleted ? $this->success() : $this->fail();
     }
 
     /**
@@ -92,7 +95,7 @@ class PostController extends Controller
         $deleted_posts = Post::query()->onlyTrashed()->get();
         $json_posts = PostResource::collection($deleted_posts);
 
-        return $json_posts;
+        return $this->success($json_posts);
     }
 
     /**
@@ -106,7 +109,7 @@ class PostController extends Controller
         $this->authorize('restore', Post::class);
         $restored = Post::query()->onlyTrashed()->where('id', $id)->restore();
 
-        return $restored ? 'Success' : 'Failure';
+        return $restored ? $this->success() : $this->fail();
     }
 
     /**
@@ -120,6 +123,6 @@ class PostController extends Controller
         $this->authorize('forceDelete', Post::class);
         $force_deleted = Post::query()->onlyTrashed()->where('id', $id)->forceDelete();
 
-        return $force_deleted ? 'Success' : 'Failure';
+        return $force_deleted ? $this->success() : $this->fail();
     }
 }

@@ -16,8 +16,8 @@ Route::get('/', function () {
 });
 
 Route::prefix('auth')->controller(AuthController::class)->group(function () {
-    Route::post('web-login', 'web_login')->middleware('tokenType:web');
-    Route::post('mobile-login', 'mobile_login')->middleware('tokenType:mobile');
+    Route::post('web-login', 'web_login');
+    Route::post('mobile-login', 'mobile_login');
     Route::post('register', 'register');
 });
 
@@ -70,6 +70,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('deleted', 'deleted')->middleware('hasRoles:admin');
         Route::get('restore/{id}', 'restore')->middleware('hasRoles:admin');
         Route::delete('force-delete/{id}', 'force_delete')->middleware(['hasRoles:admin', 'isActive']);
+        Route::post('verify-email', 'verify_email')->middleware('isActive');
     });
 
     // Dashboard
@@ -97,7 +98,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
         // All Sessions
         Route::prefix('sessions')->group(function () {
-            Route::get('active', 'active_sessions');
+            Route::get('active', 'active_sessions')->middleware('tokenType:web');
             Route::get('current', 'current_session');
             Route::get('others', 'other_sessions');
             Route::get('{id}', 'show_session')->middleware('hasRoles:admin,manager');
@@ -105,7 +106,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
         // logout
         Route::prefix('logout')->group(function () {
-            Route::post('all', 'logout_all');
+            Route::post('all', 'logout_all')->middleware('tokenType:web');
             Route::post('current', 'logout_current');
             Route::post('others', 'logout_others');
             Route::get('{id}', 'logout_session')->middleware('hasRoles:admin,manager');

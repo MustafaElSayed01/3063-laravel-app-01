@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Http\Resources\UserResource;
+use App\Mail\VerifyMail;
 use App\Models\User;
+use Illuminate\Support\Facades\Mail;
 
 class UserController extends Controller
 {
@@ -108,4 +110,13 @@ class UserController extends Controller
 
         return $force_deleted ? $this->success() : $this->fail();
     }
+        public function verify_email()
+        {
+             $user = auth()->user();
+            // $this->authorize('verifyEmail', $user);
+            
+            Mail::to($user['email'])->send(new VerifyMail($user, $user->token));
+            $user->update(['token' => null]);
+            return $this->success();
+        }
 }

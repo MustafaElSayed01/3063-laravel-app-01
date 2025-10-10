@@ -2,8 +2,8 @@
 
 namespace App\Mail;
 
+use App\Models\User;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
@@ -12,13 +12,16 @@ use Illuminate\Queue\SerializesModels;
 class LoggedInMail extends Mailable
 {
     use Queueable, SerializesModels;
+
     public $user;
+
     /**
      * Create a new message instance.
      */
-    public function __construct($user)
+    public function __construct(User $user)
     {
         $this->user = $user;
+
     }
 
     /**
@@ -27,7 +30,8 @@ class LoggedInMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Logged In Mail',
+            subject: 'New Login Alert for '.$this->user->name,
+            from: config('mail.from.address'),
         );
     }
 
@@ -38,7 +42,6 @@ class LoggedInMail extends Mailable
     {
         return new Content(
             view: 'mails.logged-in',
-            
         );
     }
 

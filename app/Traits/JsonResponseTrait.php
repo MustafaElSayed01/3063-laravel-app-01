@@ -12,6 +12,7 @@ trait JsonResponseTrait
         101 => 'Switching Protocols',
         102 => 'Processing',
         103 => 'Early Hints',
+
         // 2xx Responses
         200 => 'OK',
         201 => 'Created',
@@ -60,7 +61,7 @@ trait JsonResponseTrait
         ], $statusCode);
     }
 
-    public function fail($statusCode = 400): JsonResponse
+    public function fail($data = null, int $statusCode = 400): JsonResponse
     {
         return response()->json([
             'success' => false,

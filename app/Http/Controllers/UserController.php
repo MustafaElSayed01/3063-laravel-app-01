@@ -7,14 +7,16 @@ use App\Http\Requests\UpdateUserRequest;
 use App\Http\Resources\UserResource;
 use App\Mail\VerifyMail;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(): JsonResponse
     {
         $this->authorize('viewAny', User::class);
         $users = User::all();
@@ -26,7 +28,7 @@ class UserController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreUserRequest $request)
+    public function store(StoreUserRequest $request): JsonResponse
     {
         $this->authorize('create', User::class);
         $data = $request->validated();
@@ -38,24 +40,37 @@ class UserController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(User $user)
+    public function show(User $user): JsonResponse
     {
         $this->authorize('view', $user);
         $user->load(['posts', 'comments', 'replies']);
         $user_json = UserResource::make($user);
 
         return $this->success($user_json);
-
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateUserRequest $request, User $user)
+    public function update(UpdateUserRequest $request, User $user): JsonResponse
     {
         $this->authorize('update', $user);
         $data = $request->validated();
+
+        $originalEmail = $user->email;
         $updated = $user->update($data);
+
+        if ($updated && isset($data['email']) && $data['email'] !== $originalEmail) {
+            // Reset verification state
+            $user->forceFill([
+                'email_verified_at' => null,
+                'email_verification_token' => Str::uuid(),
+            ])->save();
+
+            // Send verification mail
+            $verificationUrl = url('/api/auth/email/verify?token='.$user->email_verification_token);
+            Mail::to($user->email)->send(new VerifyMail($user, $verificationUrl));
+        }
 
         return $updated ? $this->success() : $this->fail();
     }
@@ -63,7 +78,7 @@ class UserController extends Controller
     /**
      * Soft delete the specified resource.
      */
-    public function destroy(User $user)
+    public function destroy(User $user): JsonResponse
     {
         $this->authorize('delete', $user);
         $deleted = $user->delete();
@@ -74,7 +89,7 @@ class UserController extends Controller
     /**
      * Return a list of soft-deleted users.
      */
-    public function deleted()
+    public function deleted(): JsonResponse
     {
         $this->authorize('viewAny', User::class);
         $deletedUsers = User::onlyTrashed()->get();
@@ -86,12 +101,10 @@ class UserController extends Controller
     /**
      * Restore the specified soft-deleted user.
      */
-    public function restore($id)
+    public function restore($id): JsonResponse
     {
         $user = User::onlyTrashed()->findOrFail($id);
-
         $this->authorize('restore', $user);
-
         $restored = $user->restore();
 
         return $restored ? $this->success() : $this->fail();
@@ -100,23 +113,36 @@ class UserController extends Controller
     /**
      * Permanently delete the specified user.
      */
-    public function force_delete($id)
+    public function force_delete($id): JsonResponse
     {
         $user = User::onlyTrashed()->findOrFail($id);
-
         $this->authorize('forceDelete', $user);
-
         $force_deleted = $user->forceDelete();
 
         return $force_deleted ? $this->success() : $this->fail();
     }
-        public function verify_email()
-        {
-             $user = auth()->user();
-            // $this->authorize('verifyEmail', $user);
-            
-            Mail::to($user['email'])->send(new VerifyMail($user, $user->token));
-            $user->update(['token' => null]);
-            return $this->success();
-        }
+
+    /**
+     * Activate the specified user.
+     */
+    public function active($id): JsonResponse
+    {
+        $this->authorize('active', User::class);
+        $user = User::findOrFail($id);
+        $active = $user->update(['is_active' => true]);
+
+        return $active ? $this->success() : $this->fail();
+    }
+
+    /**
+     * Deactivate the specified user.
+     */
+    public function deactive($id): JsonResponse
+    {
+        $this->authorize('deactive', User::class);
+        $user = User::findOrFail($id);
+        $deactive = $user->update(['is_active' => false]);
+
+        return $deactive ? $this->success() : $this->fail();
+    }
 }

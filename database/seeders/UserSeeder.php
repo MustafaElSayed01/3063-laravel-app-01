@@ -14,10 +14,11 @@ class UserSeeder extends Seeder
     {
         User::factory()->create([
             'name' => 'Admin',
-            'email' => 'admin@example.com',
+            'email' => 'mustafaelsayedfouda@hotmail.com',
             'mobile' => '0123456789',
             'role' => 'admin',
             'password' => 'password',
+            'is_active' => '1',
         ]);
 
         User::factory(10)->create();

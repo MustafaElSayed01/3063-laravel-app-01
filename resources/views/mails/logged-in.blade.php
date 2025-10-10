@@ -49,16 +49,15 @@
 <body>
     <div class="container">
         <div class="header">
-            <h2>Login Alert Mustafa's Mail</h2>
+            <h2>Login Alert Mail</h2>
         </div>
         <div class="content">
             <p>Hello <strong>{{$user->name}}</strong>,</p>
 
             <p>We noticed a login to your account.</p>
 
-           
 
-            <p>If this was you, no further action is needed.  
+            <p>If this was you, no further action is needed.
             If you don’t recognize this login, please reset your password immediately.</p>
 
             <p style="margin-top: 20px;">

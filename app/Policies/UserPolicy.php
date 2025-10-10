@@ -65,4 +65,20 @@ class UserPolicy
     {
         return $user->hasAbility('users:forceDelete', ['admin']);
     }
+
+    /**
+     * Determine whether the user can activate the model.
+     */
+    public function active(User $user): bool
+    {
+        return $user->hasAbility('users:active', ['admin', 'manager']);
+    }
+
+    /**
+     * Determine whether the user can de-activate the model.
+     */
+    public function deactive(User $user): bool
+    {
+        return $user->hasAbility('users:deactive', ['admin', 'manager']);
+    }
 }

@@ -9,16 +9,27 @@ use App\Http\Controllers\ReactionTypeController;
 use App\Http\Controllers\ReplyController;
 use App\Http\Controllers\UserController;
 
+use App\Mail\LoggedInMail;
+use App\Models\User;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return 'Welcome  API';
 });
 
+Route::get('/send-mail', function () {
+    return Mail::to('mustafaelsayedfouda@hotmail.com')->send(new LoggedInMail(User::query()->where('id', 1)->first()));
+    // return new LoggedInMail(User::query()->where('id', 1)->first());
+});
+
 Route::prefix('auth')->controller(AuthController::class)->group(function () {
+    Route::post('register', 'register');
     Route::post('web-login', 'web_login');
     Route::post('mobile-login', 'mobile_login');
-    Route::post('register', 'register');
+    Route::get('email/verify', 'verify_email')->middleware('isActive');
+    Route::get('email/re-verify', 're_verify_email')->middleware('isActive');
+
 });
 
 Route::middleware(['auth:sanctum'])->group(function () {
@@ -70,7 +81,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('deleted', 'deleted')->middleware('hasRoles:admin');
         Route::get('restore/{id}', 'restore')->middleware('hasRoles:admin');
         Route::delete('force-delete/{id}', 'force_delete')->middleware(['hasRoles:admin', 'isActive']);
-        Route::post('verify-email', 'verify_email')->middleware('isActive');
+        Route::get('activate/{id}', 'active')->middleware('hasRoles:admin,manager', 'isActive');
+        Route::get('deactivate/{id}', 'deactive')->middleware('hasRoles:admin,manager', 'isActive');
     });
 
     // Dashboard

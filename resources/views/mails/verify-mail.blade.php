@@ -1,6 +1,3 @@
-<?php
-$verificationUrl = 'https://example.com/verify-email?token=' . $token;
-?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -128,33 +125,33 @@ $verificationUrl = 'https://example.com/verify-email?token=' . $token;
             <div class="email-header">
                 <h1>Verify Your Email Address</h1>
             </div>
-            
+
             <div class="email-body">
                 <p class="greeting">Hello {{ $user->name }},</p>
-                
+
                 <div class="content">
                     <p>Thank you for registering with {{ config('app.name') }}! We're excited to have you on board.</p>
                     <p>To complete your registration and start using your account, please verify your email address by clicking the button below:</p>
                 </div>
-                
+
                 <div class="verify-button">
                     <a href="{{ $verificationUrl }}">Verify Email Address</a>
                 </div>
-                
+
                 <div class="expiry-notice">
                     <strong>⏰ Important:</strong> This verification link will expire in 60 minutes for security purposes.
                 </div>
-                
+
                 <div class="alternative-link">
                     <p>If the button above doesn't work, copy and paste the following link into your browser:</p>
                     <p><a href="{{ $verificationUrl }}" class="link-text">{{ $verificationUrl }}</a></p>
                 </div>
-                
+
                 <div class="content" style="margin-top: 30px;">
                     <p>If you did not create an account with us, please ignore this email and no further action is required.</p>
                 </div>
             </div>
-            
+
             <div class="email-footer">
                 <p>&copy; {{ date('Y') }} {{ config('app.name') }}. All rights reserved.</p>
                 <p>This is an automated email, please do not reply to this message.</p>

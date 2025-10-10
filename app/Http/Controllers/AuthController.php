@@ -4,20 +4,45 @@ namespace App\Http\Controllers;
 
 use App\Helpers\AbilityGenerator;
 use App\Http\Requests\LoginRequest;
+use App\Http\Requests\RegisterRequest;
 use App\Mail\LoggedInMail;
+use App\Mail\VerifyMail;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
     /**
+     * Register a new user
+     */
+    public function register(RegisterRequest $request): JsonResponse
+    {
+        $data = $request->validated();
+        $user = User::create($data);
+
+        $user->role = 'user';
+        // $user->is_active = true;
+        $user->email_verification_token = Str::uuid();
+        $user->save();
+
+        $verificationUrl = url('/api/auth/email/verify?token='.$user->email_verification_token);
+
+        Mail::to($user->email)->send(new VerifyMail($user, $verificationUrl));
+
+        return $this->success([
+            'message' => 'User registered successfully. Please check your email to verify your account.',
+            'verify_url' => $verificationUrl,
+        ], 201);
+    }
+
+    /**
      * Web login
      *
      * Validate login credentials and return user with token if valid
-     *
-     * @return \Illuminate\Http\Response
      */
     public function web_login(LoginRequest $request): JsonResponse
     {
@@ -30,18 +55,17 @@ class AuthController extends Controller
             $user['token'] = $token->plainTextToken;
             // Send email to user
             Mail::to($user['email'])->send(new LoggedInMail($user));
-            return response()->json($user, 200);
+
+            return $this->success($user);
         }
 
-        return response()->json(['message' => 'Unauthorized'], 401);
+        return $this->fail(statusCode: 401);
     }
 
     /**
      * Mobile login
      *
      * Validate login credentials and return user with token if valid
-     *
-     * @return \Illuminate\Http\Response
      */
     public function mobile_login(LoginRequest $request): JsonResponse
     {
@@ -49,16 +73,51 @@ class AuthController extends Controller
         $auth = Auth::attempt($data);
         if ($auth) {
             $user = Auth::user();
-
             $abilities = AbilityGenerator::generate($user->role, 'mobile');
-
             $token = $user->createToken('mobile', $abilities);
             $user['token'] = $token->plainTextToken;
+            // Send email to user
+            Mail::to($user['email'])->send(new LoggedInMail($user));
 
-            return response()->json($user, 200);
+            return $this->success($user);
         }
 
-        return response()->json(['message' => 'Unauthorized'], 401);
+        return $this->fail(statusCode: 401);
+    }
+
+    /**
+     * Verify email address of user
+     */
+    public function verify_email(Request $request): JsonResponse
+    {
+        $token = $request->query('token');
+        $user = User::where('email_verification_token', $token)->first();
+        if (! $user) {
+            return $this->fail();
+        }
+
+        $user->email_verified_at = now();
+        $user->email_verification_token = null;
+        $user->save();
+
+        return $this->success();
+    }
+
+    public function resendVerification(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        if ($user->email_verified_at) {
+            return $this->fail();
+        }
+        $user->email_verification_token = Str::uuid();
+        $user->save();
+        $verificationUrl = url('/api/auth/email/verify?token='.$user->email_verification_token);
+        Mail::to($user->email)->send(new VerifyMail($user, $verificationUrl));
+
+        return $this->success([
+            'message' => 'Verification email resent successfully.',
+            'verify_url' => $verificationUrl,
+        ]);
     }
 
     // Session Management Routes
@@ -109,7 +168,6 @@ class AuthController extends Controller
         return response()->json(['message' => 'Session not found'], 404);
     }
 
-    // Logout Routes
     // Logout from all sessions for current user
     public function logout_all(Request $request): JsonResponse
     {

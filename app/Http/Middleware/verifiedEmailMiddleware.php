@@ -19,8 +19,8 @@ class verifiedEmailMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         $user = $request->user();
-        if ($user && ! $user->hasVerifiedEmail()) {
-            return $this->fail(401);
+        if (! $user || ! $user->email_verified_at) {
+            return $this->fail(403);
         }
 
         return $next($request);
